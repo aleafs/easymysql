@@ -1,13 +1,12 @@
 /* vim: set expandtab tabstop=2 shiftwidth=2 foldmethod=marker: */
 
 var should  = require('should');
-var config  = require(__dirname + '/../../lib/config.js');
-var Mysql   = require(__dirname + '/../../lib/mysql.js');
+var Mysql   = require(__dirname + '/../');
 
 /**
  * @mysql配置
  */
-var options = config.create(__dirname + '/etc/mysql_test.ini').all();
+var options = require(__dirname + '/config.json');
 
 describe('mysql with node-mysql', function () {
 
