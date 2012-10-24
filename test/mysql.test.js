@@ -6,7 +6,19 @@ var Mysql   = require(__dirname + '/../');
 /**
  * @mysql配置
  */
-var options = require(__dirname + '/config.json');
+var options = {
+  'host'  : '127.0.0.1',
+  'port'  : 3306,
+  'user'  : 'root',
+  'password'  : ''
+};
+try {
+  var _ = require(__dirname + '/config.json');
+  for (var i in _) {
+    options[i] = _[i];
+  }
+} catch (e) {
+}
 
 describe('mysql with node-mysql', function () {
 
