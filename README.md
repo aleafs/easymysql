@@ -2,6 +2,8 @@
 
 ## About
 
+`mysql-cluster` is a complete mysql client in cluster mode, which is based on [`node-mysql`](https://github.com/felixge/node-mysql).
+
 ## Install
 
 ```bash
@@ -9,6 +11,31 @@ $ npm install mysql-cluster
 ```
 
 ## Usage
+
+```javascript
+
+var Client = require('mysql-cluster');
+
+var mysql = Client.create({
+  'maxconnection' : 10
+});
+
+mysql.addserver({
+  'host' : '127.0.0.1',
+  'user' : 'write_user',
+  'password' : ''
+});
+mysql.addserver({
+  'host' : '127.0.0.1',
+  'user' : 'read_user',
+  'password' : ''
+});
+
+mysql.query('SHOW DATABASES', function (error, res) {
+  console.log(res);
+});
+
+```
 
 ## License
 

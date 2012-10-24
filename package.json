@@ -4,8 +4,8 @@
     "author": "Aleafs Zhang (zhangxc83@gmail.com)",
     "contributors": [],
     "homepage": "git@github.com:aleafs/mysql-cluster.git",
-    "description": "A new develop framework for Node.js",
-    "keywords": [ "shark", "Node.js", "framework" ],
+    "description": "Mysql client in cluster mode, based on node-mysql",
+    "keywords": [ "mysql", "cluster" ],
     "dependencies": {
       "mysql"       : "=2.0.0-alpha3"
     },
