@@ -53,3 +53,26 @@ describe('mysql with node-mysql', function () {
 
 });
 
+describe('mysql pool', function () {
+
+  it ('should_mysql_pool_works_fine', function (done) {
+
+    var _me = Mysql.createPool({
+      'maxconnection' : 2
+    });
+
+    _me.addserver(config);
+    _me.addserver(config);
+    _me.addserver({
+      'host'  : '1.1.1.1',
+      'user'  : 'root',
+      'password'  : ''
+    });
+    _me.query('SHOW DATABASES', 100, function (error, res) {
+      console.log(error);
+      done();
+    });
+  });
+
+});
+
