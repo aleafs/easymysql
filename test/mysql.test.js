@@ -29,15 +29,22 @@ describe('mysql with node-mysql', function () {
       'maxconnection' : 2
     });
 
+    var tmp = [];
     _me.on('free', function (num) {
-      console.log('a');
-      done();
+      tmp.push(num);
     });
 
-    for (var i = 0; i < 3; i++) {
-      _me.query('SELECT SLEEP(0.01) AS a', function (error, rows) {
+    var now = Date.now();
+    var num = 5;
+    for (var i = 0; i < num; i++) {
+      _me.query('SELECT SLEEP(0.05) AS a', function (error, rows) {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
+        if (0 === (--num)) {
+          tmp.should.eql([1]);
+          (Date.now() - now).should.below(250);
+          done();
+        }
       });
     }
   });
