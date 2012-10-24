@@ -30,19 +30,20 @@ describe('mysql with node-mysql', function () {
     });
 
     var tmp = [];
-    _me.on('free', function (num) {
+    _me.on('free', function (num, flag) {
       tmp.push(num);
+      flag.should.eql(3);
     });
 
     var now = Date.now();
     var num = 5;
     for (var i = 0; i < num; i++) {
-      _me.query('SELECT SLEEP(0.05) AS a', function (error, rows) {
+      _me.query('SELECT SLEEP(0.03) AS a', function (error, rows) {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
         if (0 === (--num)) {
           tmp.should.eql([1]);
-          (Date.now() - now).should.below(250);
+          (Date.now() - now).should.below(150);
           done();
         }
       });
