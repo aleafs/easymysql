@@ -7,7 +7,7 @@
     "description": "A new develop framework for Node.js",
     "keywords": [ "shark", "Node.js", "framework" ],
     "dependencies": {
-      "mysql"       : "=2.0.0-alpha3",
+      "mysql"       : "=2.0.0-alpha3"
     },
     "engines": {
       "node": ">=0.6.9"
