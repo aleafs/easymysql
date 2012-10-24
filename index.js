@@ -2,4 +2,5 @@
 
 "use strict";
 
-module.exports = require(__dirname + '/lib/mysql.js');
+module.exports = require(__dirname + '/lib/cluster.js');
+
