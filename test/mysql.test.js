@@ -29,9 +29,7 @@ describe('mysql with node-mysql', function () {
       'maxconnection' : 2
     });
 
-    var tmp = [];
     _me.on('free', function (num, flag) {
-      tmp.push(num);
       flag.should.eql(3);
     });
 
@@ -42,7 +40,6 @@ describe('mysql with node-mysql', function () {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
         if (0 === (--num)) {
-          tmp.should.eql([1]);
           (Date.now() - now).should.below(150);
           done();
         }
@@ -69,7 +66,8 @@ describe('mysql pool', function () {
       'password'  : ''
     });
     _me.query('SHOW DATABASES', 100, function (error, res) {
-      console.log(error);
+      should.ok(!error);
+      JSON.stringify(res).should.include('{"Database":"mysql"}');
       done();
     });
   });
