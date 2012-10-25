@@ -51,7 +51,7 @@ describe('mysql pool', function () {
 
   /* {{{ should_query_timeout_works_fine() */
   it ('should_query_timeout_works_fine', function (done) {
-    var _me = Mysql.createPool({'maxconnection' : 2});
+    var _me = Mysql.create({'maxconnection' : 2});
     _me.addserver(config);
 
     _me.on('timeout', function (error, res, sql) {
@@ -84,7 +84,7 @@ describe('mysql pool', function () {
     var now = Date.now();
     var num = 5;
     for (var i = 0; i < num; i++) {
-      _me.query('SELECT SLEEP(0.03) AS a', function (error, rows) {
+      _me.query('SELECT SLEEP(0.03) AS a', 100, function (error, rows) {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
         if (0 === (--num)) {
@@ -95,20 +95,6 @@ describe('mysql pool', function () {
     }
   });
   /* }}} */
-
-  xit ('should_', function (done) {
-    var _me = Mysql.createPool({'maxconnection' : 1});
-    _me.addserver({
-      'host'  : '127.0.0.1',
-      'port'  : 33006,
-      'user'  : 'root',
-      'password'  : ''
-    });
-    _me.query('SELECT 1', function (error, res) {
-      console.log(error);
-      done();
-    });
-  });
 
 });
 
