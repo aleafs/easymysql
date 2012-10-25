@@ -21,16 +21,43 @@ try {
 } catch (e) {
 }
 
-describe('mysql with node-mysql', function () {
+/* {{{ private function createServer() */
+
+var FakeServer = require(__dirname + '/../node_modules/mysql/test/FakeServer.js');
+
+var createServer = function (port, cb, onquery) {
+
+  var _me = new FakeServer();
+  _me.on('connection', function (client) {
+    client.handshake();
+    client.on('query', function (packet) {
+      onquery(client, packet);
+    });
+  });
+  _me.listen(port, function (error) {
+    if (error) {
+      throw error;
+    }
+    cb();
+  });
+
+  return _me;
+};
+/* }}} */
+
+describe('mysql pool', function () {
 
   /* {{{ should_mysql_with_2_conn_pool_works_fine() */
   it('should_mysql_with_2_conn_pool_works_fine', function (done) {
-    var _me = Mysql.create(config, {
+
+    var _me = Mysql.createPool({
       'maxconnection' : 2
     });
-
-    _me.on('free', function (num, flag) {
-      flag.should.eql(3);
+    _me.addserver(config);
+    _me.addserver({
+      'host'  : '1.1.1.1',
+      'user'  : 'root',
+      'password'  : ''
     });
 
     var now = Date.now();
@@ -48,26 +75,16 @@ describe('mysql with node-mysql', function () {
   });
   /* }}} */
 
-});
-
-describe('mysql pool', function () {
-
-  it ('should_mysql_pool_works_fine', function (done) {
-
-    var _me = Mysql.createPool({
-      'maxconnection' : 2
-    });
-
-    _me.addserver(config);
-    _me.addserver(config);
+  xit ('should_', function (done) {
+    var _me = Mysql.createPool({'maxconnection' : 1});
     _me.addserver({
-      'host'  : '1.1.1.1',
+      'host'  : '127.0.0.1',
+      'port'  : 33006,
       'user'  : 'root',
       'password'  : ''
     });
-    _me.query('SHOW DATABASES', 100, function (error, res) {
-      should.ok(!error);
-      JSON.stringify(res).should.include('{"Database":"mysql"}');
+    _me.query('SELECT 1', function (error, res) {
+      console.log(error);
       done();
     });
   });
