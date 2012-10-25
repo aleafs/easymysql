@@ -1,5 +1,7 @@
 [![Build Status](https://secure.travis-ci.org/aleafs/mysql-cluster.png?branch=master)](http://travis-ci.org/aleafs/mysql-cluster)
 
+正在开发中，尚不完备。
+
 ## About
 
 `mysql-cluster` is a complete mysql client in cluster mode, which is based on [`node-mysql`](https://github.com/felixge/node-mysql).
