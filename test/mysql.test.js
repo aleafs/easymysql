@@ -71,7 +71,7 @@ describe('mysql pool', function () {
   /* {{{ should_mysql_with_2_conn_pool_works_fine() */
   it('should_mysql_with_2_conn_pool_works_fine', function (done) {
 
-    var _me = Mysql.createPool({
+    var _me = Mysql.create({
       'maxconnection' : 2
     });
     _me.addserver(config);
