@@ -84,7 +84,7 @@ describe('mysql pool', function () {
     var now = Date.now();
     var num = 5;
     for (var i = 0; i < num; i++) {
-      _me.query('SELECT SLEEP(0.03) AS a', 100, function (error, rows) {
+      _me.query('SELECT SLEEP(0.03) AS a', 200, function (error, rows) {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
         if (0 === (--num)) {
