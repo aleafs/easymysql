@@ -67,6 +67,11 @@ describe('mysql connection', function () {
 
   /* {{{ should_auth_fail_works_fine() */
   it('should_auth_fail_works_fine', function (done) {
+
+    if (Common.istravis) {
+      return done();
+    }
+
     var _me = Connection.create(Common.extend({'user' : 'i_am_not_exists'}));
 
     var err = 0;

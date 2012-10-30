@@ -26,3 +26,5 @@ exports.extend = function (a) {
   return b;
 };
 
+exports.istravis = process.env.CI ? true : false;
+
