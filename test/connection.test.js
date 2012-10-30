@@ -37,7 +37,7 @@ describe('mysql connection', function () {
           should.ok(!error);
           _me.close(done);
         });
-      }, 100);
+      }, 140);
     });
   });
   /* }}} */
@@ -55,6 +55,25 @@ describe('mysql connection', function () {
     _me.query('SELECT SLEEP(0.02)', 10, function (error, res) {
       error.should.have.property('name', 'QueryTimeout');
       error.message.should.include('Mysql query timeout after 10 ms');
+    });
+  });
+  /* }}} */
+
+  /* {{{ should_auth_fail_works_fine() */
+  it('should_auth_fail_works_fine', function (done) {
+    var _me = Connection.create(Common.extend({'user' : 'i_am_not_exists'}));
+
+    var err = 0;
+    _me.on('error', function (e) {
+      err++;
+    });
+
+    _me.query('SHOW DATABASES', 100, function (error, res) {
+      error.should.have.property('code', 'ER_ACCESS_DENIED_ERROR');
+      setTimeout(function () {
+        err.should.eql(2);
+        _me.close(done);
+      }, 100);
     });
   });
   /* }}} */
