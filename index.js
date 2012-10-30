@@ -2,5 +2,7 @@
 
 "use strict";
 
-module.exports = require(__dirname + '/lib/cluster.js');
+var LIBPATH = __dirname + (process.env.MYSQL_CLUSTER_COV ? '/lib-cov' : '/lib');
+
+module.exports = require(LIBPATH + '/cluster.js');
 
