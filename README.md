@@ -1,5 +1,7 @@
 [![Build Status](https://secure.travis-ci.org/aleafs/easymysql.png?branch=master)](http://travis-ci.org/aleafs/easymysql)
 
+Click [*here*](https://aleafs.github.com/coverage/easymysql.html) to get test coverage detail.
+
 正在开发中，尚不完备。
 
 ## About
