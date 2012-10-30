@@ -12,8 +12,11 @@ describe('mysql pool', function () {
   /* {{{ should_query_timeout_works_fine() */
   it ('should_query_timeout_works_fine', function (done) {
     var _me = Mysql.create({'maxconnection' : 2});
-    _me.addserver(config);
+    _me.on('error', function (error) {
+      console.log(error);
+    });
 
+    _me.addserver(config);
     _me.on('timeout', function (error, res, sql) {
       should.ok(!error);
       sql.should.eql('SELECT SLEEP(0.06) AS a');
@@ -33,6 +36,8 @@ describe('mysql pool', function () {
 
     var _me = Mysql.create({
       'maxconnection' : 2
+    });
+    _me.on('error', function (error) {
     });
     _me.addserver(config);
 
