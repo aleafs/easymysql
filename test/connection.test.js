@@ -32,12 +32,15 @@ describe('mysql connection', function () {
       error.should.have.property('name', 'QueryTimeout');
       blocker.open();
 
-      setTimeout(function () {
+      _me.on('state', function (code) {
+        if (code < 1) {
+          return;
+        }
         _me.query('SHOW DATABASES', 20, function (error, res) {
           should.ok(!error);
           _me.close(done);
         });
-      }, 140);
+      });
     });
   });
   /* }}} */
@@ -45,6 +48,9 @@ describe('mysql connection', function () {
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
     var _me = Connection.create(Common.config);
+
+    _me.on('error', function (e) {
+    });
 
     _me.on('timeout', function (error, res, sql) {
       should.ok(!error);
