@@ -2,6 +2,7 @@
 
 var util = require('util');
 var should = require('should');
+var interceptor = require('interceptor');
 var Mysql = require(__dirname + '/../');
 
 /**
@@ -21,30 +22,6 @@ try {
   }
 } catch (e) {
 }
-/* }}} */
-
-/* {{{ private function createServer() */
-
-var FakeServer = require(__dirname + '/../node_modules/mysql/test/FakeServer.js');
-
-var createServer = function (port, cb, onquery) {
-
-  var _me = new FakeServer();
-  _me.on('connection', function (client) {
-    client.handshake();
-    client.on('query', function (packet) {
-      onquery(client, packet);
-    });
-  });
-  _me.listen(port, function (error) {
-    if (error) {
-      throw error;
-    }
-    cb();
-  });
-
-  return _me;
-};
 /* }}} */
 
 describe('mysql pool', function () {
@@ -101,31 +78,32 @@ describe('mysql pool', function () {
   });
   /* }}} */
 
-  /* {{{ should_mysql_server_restart_works_fine() */
-  xit('should_mysql_server_restart_works_fine', function (done) {
+  /* {{{ should_reconnect_works_fine() */
+  it ('should_reconnect_works_fine', function (done) {
 
-    /**
-     * 只开一个连接，那么SQL一定是顺序执行
-     */
-    var clt = Mysql.create({'maxconnection' : 1});
-    clt.addserver({'host' : 'localhost', 'port' : 33749});
-    clt.query('SELECT 1', 50, function () {});
-    clt.query('SELECT 2', 50, function () {});
+    var blocker = interceptor.create(util.format('%s:%d', config.host, config.port || 3306));
+    blocker.listen(33061);
 
-    var num = 2;
+    var _me = Mysql.create({'maxconnection' : 1});
+    _me.addserver({
+      'host'  : 'localhost',
+      'port'  : 33061,
+      'user'  : config.user,
+      'password' : config.password
+    });
 
-    var onquery = function (client, packet) {
-      console.log(packet);
-      --num;
-      if (!num) {
+    blocker.block();
+
+    _me.query('SHOW DATABASES', 25, function (error, res) {
+      error.should.have.property('name', 'QueryTimeout');
+
+      blocker.open();
+      _me.query('SHOW DATABASES', 20, function (error, res) {
+        console.log(error);
+    //    should.ok(!error);
         done();
-      } else {
-        svr.destroy();
-        svr = createServer(33749, function () {}, onquery);
-      }
-    };
-
-    var svr = createServer(33749, function () {}, onquery);
+      });
+    });
   });
   /* }}} */
 
