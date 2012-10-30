@@ -68,13 +68,17 @@ describe('mysql pool', function () {
   });
   /* }}} */
 
-  /* {{{ should_mysql_with_2_conn_pool_works_fine() */
-  it('should_mysql_with_2_conn_pool_works_fine', function (done) {
+  /* {{{ should_mysql_conn_pool_works_fine() */
+  it('should_mysql_conn_pool_works_fine', function (done) {
 
     var _me = Mysql.create({
       'maxconnection' : 2
     });
     _me.addserver(config);
+
+    /**
+     * @连接不同的机器 
+     */
     _me.addserver({
       'host'  : '1.1.1.1',
       'user'  : 'root',
@@ -88,11 +92,40 @@ describe('mysql pool', function () {
         should.ok(!error);
         rows.should.eql([{'a' : '0'}]);
         if (0 === (--num)) {
-          (Date.now() - now).should.below(150);
+          // 30 * 5 = 150 (ms)
+          (Date.now() - now).should.below(120);
           done();
         }
       });
     }
+  });
+  /* }}} */
+
+  /* {{{ should_mysql_server_restart_works_fine() */
+  xit('should_mysql_server_restart_works_fine', function (done) {
+
+    /**
+     * 只开一个连接，那么SQL一定是顺序执行
+     */
+    var clt = Mysql.create({'maxconnection' : 1});
+    clt.addserver({'host' : 'localhost', 'port' : 33749});
+    clt.query('SELECT 1', 50, function () {});
+    clt.query('SELECT 2', 50, function () {});
+
+    var num = 2;
+
+    var onquery = function (client, packet) {
+      console.log(packet);
+      --num;
+      if (!num) {
+        done();
+      } else {
+        svr.destroy();
+        svr = createServer(33749, function () {}, onquery);
+      }
+    };
+
+    var svr = createServer(33749, function () {}, onquery);
   });
   /* }}} */
 

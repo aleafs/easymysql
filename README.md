@@ -4,7 +4,12 @@
 
 ## About
 
-`mysql-cluster` is a complete mysql client in cluster mode, which is based on [`node-mysql`](https://github.com/felixge/node-mysql).
+`mysql-cluster` 基于[`node-mysql`](https://github.com/felixge/node-mysql) 开发而来，提供一个简单、高可用的mysql连接基础库。主要特性如下：
+
+* 支持query超时控制；
+* 可控制的连接池支持，SQL总是尽可能早地被**可用的**空闲连接抢到并执行；
+* 支持master-slave模式，基于`SHOW VARIABLES LIKE 'READ_ONLY'`方式自动判断主库和从库，运行期间自动感知主从切换；
+* 事务支持。
 
 ## Install
 
