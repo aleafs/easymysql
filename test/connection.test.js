@@ -23,6 +23,11 @@ describe('mysql connection', function () {
       'host' : 'localhost',
       'port' : 33061
     }));
+
+    _me.on('error', function (e) {
+      //console.log(e);
+    });
+
     _me.query('SHOW DATABASES', 25, function (error, res) {
       error.should.have.property('name', 'QueryTimeout');
       blocker.open();
