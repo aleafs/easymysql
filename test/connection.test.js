@@ -42,5 +42,22 @@ describe('mysql connection', function () {
   });
   /* }}} */
 
+  /* {{{ should_query_timeout_works_fine() */
+  it('should_query_timeout_works_fine', function (done) {
+    var _me = Connection.create(Common.config);
+
+    _me.on('timeout', function (error, res, sql) {
+      should.ok(!error);
+      sql.should.eql('SELECT SLEEP(0.02)');
+      _me.close(done);
+    });
+
+    _me.query('SELECT SLEEP(0.02)', 10, function (error, res) {
+      error.should.have.property('name', 'QueryTimeout');
+      error.message.should.include('Mysql query timeout after 10 ms');
+    });
+  });
+  /* }}} */
+
 });
 
