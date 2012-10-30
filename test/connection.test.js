@@ -16,6 +16,9 @@ var getBlocker = function (port) {
   return _me;
 };
 
+var getAddress = function (config) {
+  return util.format('%s@%s:%d', config.user, config.host, config.port);
+};
 describe('mysql connection', function () {
 
   /* {{{ should_reconnect_works_fine() */
@@ -25,17 +28,18 @@ describe('mysql connection', function () {
 
     blocker.block();
 
-    var _me = Connection.create(Common.extend({
+    var config  = Common.extend({
       'host' : 'localhost',
         'port' : 33061
-    }));
-
+    });
+    var _me = Connection.create(config);
     _me.on('error', function (e) {
-      //console.log(e);
+      e.message.should.include(getAddress(config));
     });
 
     _me.query('SHOW DATABASES', 25, function (error, res) {
       error.should.have.property('name', 'QueryTimeout');
+      error.message.should.include(getAddress(config));
       blocker.open();
 
       _me.on('state', function (code) {
@@ -58,12 +62,14 @@ describe('mysql connection', function () {
   /* {{{ should_mysql_restart_wroks_fine() */
   it('should_mysql_restart_wroks_fine', function (done) {
     var blocker = getBlocker(33061);
-    var _me = Connection.create(Common.extend({
+
+    var config = Common.extend({
       'host' : 'localhost',
         'port' : 33061
-    }));
-
+    });
+    var _me = Connection.create(config);
     _me.on('error', function (e) {
+      e.message.should.include(getAddress(config));
     });
 
     var state = 1;
@@ -107,6 +113,7 @@ describe('mysql connection', function () {
     var _me = Connection.create(Common.config);
 
     _me.on('error', function (e) {
+      e.message.should.include(getAddress(Common.config));
     });
 
     _me.on('timeout', function (error, res, sql) {
@@ -119,6 +126,7 @@ describe('mysql connection', function () {
     _me.query('SELECT SLEEP(0.02)', 10, function (error, res) {
       error.should.have.property('name', 'QueryTimeout');
       error.message.should.include('Mysql query timeout after 10 ms');
+      error.message.should.include(getAddress(Common.config));
     });
   });
   /* }}} */
@@ -143,6 +151,20 @@ describe('mysql connection', function () {
         err.should.eql(2);
         _me.close(done);
       }, 100);
+    });
+  });
+  /* }}} */
+
+  /* {{{ should_error_message_contains_config() */
+  it('should_error_message_contains_config', function (done) {
+    var _me = Connection.create(Common.config);
+    _me.on('error', function (e) {
+      e.message.should.include(getAddress(Common.config));
+    });
+    _me.query('SELECT I_AM_NOT_DEFINED(123)', 10, function (error, res) {
+      error.should.have.property('name', 'MysqlError');
+      error.message.should.include(getAddress(Common.config));
+      _me.close(done);
     });
   });
   /* }}} */
