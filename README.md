@@ -1,10 +1,10 @@
-[![Build Status](https://secure.travis-ci.org/aleafs/mysql-cluster.png?branch=master)](http://travis-ci.org/aleafs/mysql-cluster)
+[![Build Status](https://secure.travis-ci.org/aleafs/easymysql.png?branch=master)](http://travis-ci.org/aleafs/easymysql)
 
 正在开发中，尚不完备。
 
 ## About
 
-`mysql-cluster` 基于[`node-mysql`](https://github.com/felixge/node-mysql) 开发而来，提供一个简单、高可用的mysql连接基础库。主要特性如下：
+`easymysql` 基于[`node-mysql`](https://github.com/felixge/node-mysql) 开发而来，提供一个简单、高可用的mysql连接基础库。主要特性如下：
 
 * 支持query超时控制；
 * 可控制的连接池支持，SQL总是尽可能早地被**可用的**空闲连接抢到并执行；
@@ -14,14 +14,14 @@
 ## Install
 
 ```bash
-$ npm install mysql-cluster
+$ npm install easymysql
 ```
 
 ## Usage
 
 ```javascript
 
-var Client = require('mysql-cluster');
+var Client = require('easymysql');
 
 var mysql = Client.create({
   'maxconnection' : 10
@@ -48,7 +48,7 @@ mysql.query('SHOW DATABASES', function (error, res) {
 
 (The MIT License)
 
-Copyright (c) 2012 aleafs and other mysql-cluster contributors
+Copyright (c) 2012 aleafs and other easymysql contributors
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
