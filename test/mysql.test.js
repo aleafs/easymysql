@@ -5,24 +5,7 @@ var should = require('should');
 var interceptor = require('interceptor');
 var Mysql = require(__dirname + '/../');
 
-/**
- * @mysql配置
- */
-/* {{{ */
-var config = {
-  'host'  : '127.0.0.1',
-  'port'  : 3306,
-  'user'  : 'root',
-  'password'  : ''
-};
-try {
-  var _ = require(__dirname + '/config.json');
-  for (var i in _) {
-    config[i] = _[i];
-  }
-} catch (e) {
-}
-/* }}} */
+var config = require(__dirname + '/common.js').extend();
 
 describe('mysql pool', function () {
 
@@ -75,35 +58,6 @@ describe('mysql pool', function () {
         }
       });
     }
-  });
-  /* }}} */
-
-  /* {{{ should_reconnect_works_fine() */
-  it ('should_reconnect_works_fine', function (done) {
-
-    var blocker = interceptor.create(util.format('%s:%d', config.host, config.port || 3306));
-    blocker.listen(33061);
-
-    var _me = Mysql.create({'maxconnection' : 1});
-    _me.addserver({
-      'host'  : 'localhost',
-      'port'  : 33061,
-      'user'  : config.user,
-      'password' : config.password
-    });
-
-    blocker.block();
-
-    _me.query('SHOW DATABASES', 25, function (error, res) {
-      error.should.have.property('name', 'QueryTimeout');
-
-      blocker.open();
-      _me.query('SHOW DATABASES', 20, function (error, res) {
-        console.log(error);
-    //    should.ok(!error);
-        done();
-      });
-    });
   });
   /* }}} */
 
