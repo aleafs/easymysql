@@ -6,7 +6,8 @@ var interceptor = require('interceptor');
 
 var Common = require(__dirname + '/common.js');
 
-var Connection  = require(__dirname + '/../lib/connection.js');
+var LIBPATH = process.env.MYSQL_CLUSTER_COV ? 'lib-cov' : 'lib';
+var Connection = require(util.format('%s/../%s/connection.js', __dirname, LIBPATH));
 
 describe('mysql connection', function () {
 
@@ -38,6 +39,7 @@ describe('mysql connection', function () {
         }
         _me.query('SHOW DATABASES', 20, function (error, res) {
           should.ok(!error);
+          JSON.stringify(res).should.include('{"Database":"mysql"}');
           _me.close(done);
         });
       });
