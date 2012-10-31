@@ -44,7 +44,7 @@ describe('mysql pool', function () {
   it('should_mysql_conn_pool_works_fine', function (done) {
 
     var _me = Mysql.create({
-      'maxconnection' : 2
+      'maxconnection' : 4
     });
     _me.on('error', function (error) {});
     _me.on('notice', function (message) {
@@ -64,7 +64,7 @@ describe('mysql pool', function () {
     });
 
     var now = Date.now();
-    var num = 5;
+    var num = 10;
     for (var i = 0; i < num; i++) {
       _me.query('SELECT SLEEP(0.03) AS a', 200, function (error, rows) {
         should.ok(!error);
