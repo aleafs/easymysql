@@ -64,6 +64,7 @@ describe('mysql pool', function () {
     });
 
     _me.query('SET AUTOCOMMIT = 0', 10, function (error, res) {
+      console.log(error);
       should.ok(!error);
 
       var now = Date.now();
