@@ -63,8 +63,7 @@ describe('mysql pool', function () {
       'password'  : ''
     });
 
-    _me.query('SET AUTOCOMMIT = 0', 10, function (error, res) {
-      console.log(error);
+    _me.query('SET AUTOCOMMIT = 0', 200, function (error, res) {
       should.ok(!error);
 
       var now = Date.now();
@@ -76,7 +75,7 @@ describe('mysql pool', function () {
           if (0 === (--num)) {
             // 30 * 3 = 90 (ms)
             (Date.now() - now).should.below(120);
-            _me.query('SET AUTOCOMMIT = 1', 10, function (error, res) {
+            _me.query('SET AUTOCOMMIT = 1', 20, function (error, res) {
               should.ok(!error);
               done();
             });
