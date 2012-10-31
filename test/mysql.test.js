@@ -63,19 +63,26 @@ describe('mysql pool', function () {
       'password'  : ''
     });
 
-    var now = Date.now();
-    var num = 10;
-    for (var i = 0; i < num; i++) {
-      _me.query('SELECT SLEEP(0.03) AS a', 200, function (error, rows) {
-        should.ok(!error);
-        rows.should.eql([{'a' : '0'}]);
-        if (0 === (--num)) {
-          // 30 * 5 = 150 (ms)
-          (Date.now() - now).should.below(120);
-          done();
-        }
-      });
-    }
+    _me.query('SET AUTOCOMMIT = 0', 10, function (error, res) {
+      should.ok(!error);
+
+      var now = Date.now();
+      var num = 10;
+      for (var i = 0; i < num; i++) {
+        _me.query('SELECT SLEEP(0.03) AS a', 200, function (error, rows) {
+          should.ok(!error);
+          rows.should.eql([{'a' : '0'}]);
+          if (0 === (--num)) {
+            // 30 * 3 = 90 (ms)
+            (Date.now() - now).should.below(120);
+            _me.query('SET AUTOCOMMIT = 1', 10, function (error, res) {
+              should.ok(!error);
+              done();
+            });
+          }
+        });
+      }
+    });
   });
   /* }}} */
 
