@@ -7,13 +7,19 @@ var Mysql = require(__dirname + '/../');
 
 var config = require(__dirname + '/common.js').extend();
 
+var address = util.format('%s@%s:%d', config.user, config.host, config.port);
+
 describe('mysql pool', function () {
 
   /* {{{ should_query_timeout_works_fine() */
   it ('should_query_timeout_works_fine', function (done) {
-    var _me = Mysql.create({'maxconnection' : 2});
+    var _me = Mysql.create({'maxconnection' : 1});
     _me.on('error', function (error) {
       console.log(error);
+    });
+
+    _me.on('notice', function (message) {
+      message.should.eql(util.format('hearbeat for "%s" state changed to 3', address));
     });
 
     _me.addserver(config);
