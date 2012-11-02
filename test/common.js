@@ -30,7 +30,7 @@ exports.istravis = process.env.CI ? true : false;
 
 var Server = require(__dirname + '/../node_modules/mysql/test/FakeServer.js');
 var Packet = require(__dirname + '/../node_modules/mysql/lib/protocol/packets');
-console.log(Packet);
+
 exports.liteServer = function (port, cb) {
 
   var _me = new Server();
@@ -40,22 +40,20 @@ exports.liteServer = function (port, cb) {
     }
   });
 
-  _me.on('connection', function (con) {
-    con.handshake();
-    con.on('query', function (packet) {
-      console.log(packet);
-      // XXX: 回写
-      con._sendPacket(new Packet.ResultSetHeaderPacket({
+  _me.on('connection', function (client) {
+    client.handshake();
+    client.on('query', function (packet) {
+      //console.log(packet);
+      client._sendPacket(new Packet.ResultSetHeaderPacket({
         'fieldCount' : 1,
       }));
-      con._sendPacket(new Packet.EmptyPacke());
+      client._sendPacket(new Packet.EmptyPacket());
+      return;
     });
   });
 
-  return {
-    'close' : function () {
-      _me.destroy();
-    },
-  };
+  cb && cb(function () {
+    _me.destroy();
+  });
 };
 

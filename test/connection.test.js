@@ -169,5 +169,16 @@ describe('mysql connection', function () {
   });
   /* }}} */
 
+  it('should_fake_server_works_fine', function (done) {
+    var _me = Connection.create({'host' : 'localhost', 'port' : 33751});
+    var _my = Common.liteServer(33751, function (close) {
+      _me.query('SHOW VARIABLES LIKE "read_only"', 20, function (e, res) {
+        console.log(e);
+        console.log(res);
+        close();
+        done();
+      });
+    });
+  });
 });
 
