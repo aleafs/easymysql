@@ -161,7 +161,7 @@ describe('mysql connection', function () {
     _me.on('error', function (e) {
       e.message.should.include(getAddress(Common.config));
     });
-    _me.query('SELECT I_AM_NOT_DEFINED(123)', 10, function (error, res) {
+    _me.query('SELECT I_AM_NOT_DEFINED(123)', 100, function (error, res) {
       error.should.have.property('name', 'MysqlError');
       error.message.should.include(getAddress(Common.config));
       _me.close(done);
@@ -169,14 +169,26 @@ describe('mysql connection', function () {
   });
   /* }}} */
 
-  it('should_fake_server_works_fine', function (done) {
+  /* {{{ should_got_exception_when_error_mysql_config() */
+  it('should_got_exception_when_error_mysql_config', function (done) {
+    var _me = Connection.create({'host' : '##mysql.default.host##'});
+    _me.on('error', function (e) {
+      e.message.should.include('getaddrinfo ENOENT');
+    });
+    _me.query('SHOW DATABASES', 10, function (e, res) {
+      _me.close(done);
+    });
+  });
+  /* }}} */
+
+  xit('should_fake_server_works_fine', function (done) {
     var _me = Connection.create({'host' : 'localhost', 'port' : 33751});
     var _my = Common.liteServer(33751, function (close) {
       _me.query('SHOW VARIABLES LIKE "read_only"', 20, function (e, res) {
         console.log(e);
         console.log(res);
         close();
-        done();
+        _me.close(done);
       });
     });
   });
