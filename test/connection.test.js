@@ -28,16 +28,17 @@ describe('mysql connection', function () {
       'host' : 'localhost', 'port' : 33061
     });
 
-    var _events = [];
-
     blocker.open();
     var _me = Connection.create(_config);
-    _me.on('error', function (e) {
-      e.message.should.include(getAddress(_config));
-      console.log(e);
-    });
-    _me.on('close', function (e) {
-      console.log('a' + e);
+
+    var _events = [];
+    ['error', 'close'].forEach(function (i) {
+      _me.on(i, function (e) {
+        if (e) {
+          e.message.should.include(getAddress(_config));
+        }
+        _events.push([i].concat(Array.prototype.slice.call(arguments, 0)));
+      });
     });
 
     _me.query('SHOW DATABASES', 100, function (error, res) {
@@ -49,14 +50,11 @@ describe('mysql connection', function () {
        */
       blocker.close();
 
-      done();
-      return;
       _me.query('SHOW DATABASES', 100, function (error, res) {
-        console.log(error);
-      });
-
-      _me.close(function () {
-        done();
+        should.ok(!error);
+        error.message.should.include(getAddress(_config));
+        console.log(_events);
+        _me.close(done);
       });
     });
   });
