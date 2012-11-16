@@ -22,7 +22,7 @@ var getAddress = function (config) {
 describe('mysql connection', function () {
 
   /* {{{ should_reconnect_works_fine() */
-  it('should_reconnect_works_fine', function (done) {
+  xit('should_reconnect_works_fine', function (done) {
 
     var blocker = getBlocker(33061);
 
