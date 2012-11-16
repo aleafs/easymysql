@@ -19,6 +19,7 @@ var getBlocker = function (port) {
 var getAddress = function (config) {
   return util.format('%s@%s:%d', config.user, config.host, config.port);
 };
+
 describe('mysql connection', function () {
 
   /* {{{ should_got_server_restart_event() */
@@ -56,7 +57,6 @@ describe('mysql connection', function () {
         console.log(error);
       });
 
-      return;
       _me.close(function () {
         done();
       });
