@@ -15,7 +15,8 @@
     "devDependencies": {
       "mocha"       : ">=0.9.0",
       "should"      : ">=0.4.2",
-      "interceptor" : ">=0.0.2",
+      "interceptor" : "latest",
+      "rewire"      : "latest",
       "visionmedia-jscoverage" : ">=1.0.0"
     },
     "main": "./index.js",

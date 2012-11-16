@@ -6,9 +6,7 @@ var interceptor = require('interceptor');
 
 var Common = require(__dirname + '/common.js');
 
-var LIBPATH = process.env.MYSQL_CLUSTER_COV ? 'lib-cov' : 'lib';
-var Connection = require(util.format('%s/../%s/connection.js', __dirname, LIBPATH));
-
+var Connection = require(__dirname + '/../lib/connection.js');
 var getBlocker = function (port) {
   var cfg = Common.extend();
   var _me = interceptor.create(util.format('%s:%d', cfg.host, cfg.port || 3306));
@@ -63,6 +61,12 @@ describe('mysql connection', function () {
     });
   });
   /* }}} */
+
+  it('should_connect_timeout_works_fine', function () {
+  });
+
+  it('should_query_timeout_works_fine', function () {
+  });
 
 });
 
