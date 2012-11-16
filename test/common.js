@@ -42,6 +42,11 @@ exports.mockConnection = function () {
    */
   var __Results = [];
 
+  /**
+   * @ 连接对象
+   */
+  var __Objects = [];
+
   /* {{{ private mocked Connection() */
   var Connection = function () {
     Emitter.call(this);
@@ -70,16 +75,17 @@ exports.mockConnection = function () {
         break;
       }
     }
-
-    setTimeout(function () {
+    process.nextTick(function () {
       callback(e, r);
-    }, ~~(10 * Math.random()));
+    });
   };
   /* }}} */
 
   var _me = {};
   _me.create = function () {
-    return new Connection();
+    var c = new Connection();
+    __Objects.push(c);
+    return c;
   };
 
   _me.makesureCleanAllData = function () {
@@ -89,10 +95,20 @@ exports.mockConnection = function () {
 
   _me.__mockQueryResult = function (p, res, e) {
     __Results.push(function (s) {
-      if ((new RegExp(p)).test(s)) {
+      if (s.match(new RegExp(p))) {
         return [res, e];
       }
     });
+  };
+
+  _me.__emitEvent = function (i, evt) {
+    var c = __Objects[i];
+    if (!(c instanceof Connection)) {
+      return;
+    }
+
+    var a = Array.prototype.slice.call(arguments, 1);
+    c.emit.apply(c, a);
   };
 
   return _me;

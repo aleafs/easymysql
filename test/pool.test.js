@@ -8,22 +8,43 @@ var Common = require(__dirname + '/common.js');
 
 var Connection = Common.mockConnection();
 
-Connection.__mockQueryResult(/SHOW\s+Variables\s+like\s+"READ_ONLY"/i, [{
-  'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'
-}]);
-
 beforeEach(function () {
   Connection.makesureCleanAllData();
+  Connection.__mockQueryResult(/SHOW\s+Variables\s+like\s+"READ_ONLY"/i, [{
+    'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'
+  }]);
+
   Pool.__set__({
+    'HEARTBEAT_TIMEOUT' : 5,
     'Connection' : Connection,
   });
 });
 
 describe('mysql pool', function () {
 
-  it('', function () {
-    var _me = Pool.create({}, {});
+  /* {{{ should_pool_create_works_fine() */
+  it('should_pool_create_works_fine', function (done) {
+    var _me = Pool.create({
+      'maxidletime' : 32,
+    }, {});
+
+    var _messages = [];
+    ['state', 'error'].forEach(function (i) {
+      _me.on(i, function () {
+        _messages.push([i].concat(Array.prototype.slice.call(arguments, 0)));
+      });
+    });
+
+    Connection.__emitEvent(0, 'close');
+
+    setTimeout(function () {
+      _messages.should.eql([
+        ['state', 3]
+        ]);
+      done();
+    }, 32);
   });
+  /* }}} */
 
 });
 

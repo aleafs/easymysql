@@ -1,4 +1,4 @@
-TESTS = test/*.test.js
+TESTS = test/pool.test.js
 REPORTER = spec
 TIMEOUT = 5000
 JSCOVERAGE = ./node_modules/visionmedia-jscoverage/jscoverage --encoding=utf-8
@@ -14,6 +14,6 @@ cov:
 	@-mv -f lib lib.bak
 	$(JSCOVERAGE) lib.bak lib
 	-$(MOCHA) --reporter html-cov --timeout $(TIMEOUT) $(MOCHA_OPTS) $(TESTS) > ./coverage.html
-	@-rm -rf lib && mv -f lib.bak lib
+	-rm -rf lib && mv -f lib.bak lib
 
 .PHONY: test
