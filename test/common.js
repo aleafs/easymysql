@@ -31,6 +31,7 @@ exports.istravis = process.env.CI ? true : false;
 var Server = require(__dirname + '/../node_modules/mysql/test/FakeServer.js');
 var Packet = require(__dirname + '/../node_modules/mysql/lib/protocol/packets');
 
+/* {{{ exports liteServer() */
 exports.liteServer = function (port, cb) {
 
   var _me = new Server();
@@ -55,5 +56,35 @@ exports.liteServer = function (port, cb) {
   cb && cb(function () {
     _me.destroy();
   });
+};
+/* }}} */
+
+var util = require('util');
+var Emitter = require('events').EventEmitter;
+
+exports.mockConnection = function () {
+
+  var Connection = function () {
+    Emitter.call(this);
+  }
+  util.inherits(Connection, Emitter);
+
+  Connection.prototype.clone = function () {
+  };
+
+  Connection.prototype.close = function () {
+  };
+
+  Connection.prototype.connect = function () {
+  };
+
+  Connection.prototype.query = function () {
+  };
+
+  return {
+    'create' : function (config) {
+      return new Connection();
+    },
+  };
 };
 
