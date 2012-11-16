@@ -1,4 +1,4 @@
-TESTS = test/pool.test.js
+TESTS = test/*.test.js
 REPORTER = spec
 TIMEOUT = 5000
 JSCOVERAGE = ./node_modules/visionmedia-jscoverage/jscoverage --encoding=utf-8
