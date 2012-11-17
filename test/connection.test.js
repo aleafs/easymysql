@@ -52,7 +52,6 @@ describe('mysql connection', function () {
       _me.connect(Common.config.timeout);
     }
     _me.on('error', function (e) {
-      console.log(e);
       (true).should.eql(false);
     });
     _me.query('SHOW DATABASES', 1000, function (e, r) {
