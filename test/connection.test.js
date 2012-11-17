@@ -50,11 +50,15 @@ describe('mysql connection', function () {
        */
       blocker.close();
 
-      _me.query('SHOW DATABASES', 100, function (error, res) {
-        should.ok(!error);
-        error.message.should.include(getAddress(_config));
-        console.log(_events);
-        _me.close(done);
+      process.nextTick(function () {
+        _me.query('SHOW DATABASES', 100, function (error, res) {
+          should.ok(error);
+          error.message.should.include(getAddress(_config));
+          setTimeout(function () {
+            _events.should.eql([['close']]);
+            _me.close(done);
+          }, 2);
+        });
       });
     });
   });
