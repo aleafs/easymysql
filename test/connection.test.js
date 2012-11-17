@@ -20,8 +20,51 @@ var getAddress = function (config) {
 
 describe('mysql connection', function () {
 
+  /* {{{ should_query_timeout_works_fine() */
+  it('should_query_timeout_works_fine', function (done) {
+    var _me = Connection.create(Common.config);
+    _me.on('late', function (e, r) {
+      should.ok(!e);
+      r.should.includeEql({'SLEEP(0.02)' : '0'});
+      _me.close(done);
+    });
+
+    var now = Date.now();
+    _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
+      should.ok(!e);
+      (Date.now() - now).should.above(9);
+      r.should.includeEql({'SLEEP(0.01)' : '0'});
+    });
+
+    var now = Date.now();
+    _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
+      e.should.have.property('name', 'QueryTimeout');
+      e.message.should.include(getAddress(Common.config));
+      (Date.now() - now).should.below(20);
+    });
+  });
+  /* }}} */
+
+  /* {{{ should_multi_connect_works_fine() */
+  it('should_multi_connect_works_fine', function (done) {
+    var _me = Connection.create(Common.config);
+    for (var i = 0; i < 10; i++) {
+      _me.connect(Common.config.timeout);
+    }
+    _me.on('error', function (e) {
+      console.log(e);
+      (true).should.eql(false);
+    });
+    _me.query('SHOW DATABASES', 1000, function (e, r) {
+      should.ok(!e);
+      r.should.includeEql({'Database' : 'mysql'});
+      _me.close(done);
+    });
+  });
+  /* }}} */
+
   /* {{{ should_got_server_restart_event() */
-  it('should_got_server_restart_event', function (done) {
+  xit('should_got_server_restart_event', function (done) {
 
     var blocker = getBlocker(33061);
     var _config = Common.extend({
@@ -78,51 +121,6 @@ describe('mysql connection', function () {
       e.message.should.include(getAddress(_config));
       blocker.close();
       _me.close(done);
-    });
-  });
-  /* }}} */
-
-  /* {{{ should_query_timeout_works_fine() */
-  it('should_query_timeout_works_fine', function (done) {
-    var _me = Connection.create(Common.config);
-    _me.on('late', function (e, r) {
-      should.ok(!e);
-      r.should.includeEql({'SLEEP(0.02)' : '0'});
-      _me.close(done);
-    });
-
-    var now = Date.now();
-    _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
-      should.ok(!e);
-      (Date.now() - now).should.above(9);
-      r.should.includeEql({'SLEEP(0.01)' : '0'});
-
-      _me.connect();
-    });
-
-    var now = Date.now();
-    _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
-      e.should.have.property('name', 'QueryTimeout');
-      e.message.should.include(getAddress(Common.config));
-      (Date.now() - now).should.below(20);
-    });
-  });
-  /* }}} */
-
-  /* {{{ should_clone_works_fine() */
-  it('should_clone_works_fine', function (done) {
-    var _me = Connection.create(Common.config);
-    _me.query('SELECT 1', 0, function (e, r) {
-      should.ok(!e);
-      _me.close(function () {
-        _me.close();
-      });
-
-      var the = _me.clone();
-      the.query('SELECT 1', 0, function (e, r) {
-        should.ok(!e);
-        the.close(done);
-      });
     });
   });
   /* }}} */

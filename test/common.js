@@ -4,7 +4,8 @@ var config = {
   'host'  : '127.0.0.1',
   'port'  : 3306,
   'user'  : 'root',
-  'password'  : ''
+  'password'  : '',
+  'timeout' : 1000,       /**<  connect timeout in ms */
 };
 try {
   var _ = require(__dirname + '/config.json');
@@ -91,6 +92,7 @@ exports.mockConnection = function () {
   _me.makesureCleanAllData = function () {
     __queries = [];
     __Results = [];
+    __Objects = [];
   };
 
   _me.__mockQueryResult = function (p, res, e) {
