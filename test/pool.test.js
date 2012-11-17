@@ -22,6 +22,15 @@ beforeEach(function () {
 
 describe('mysql pool', function () {
 
+  it('should_pool_get_and_release_works_fine', function (done) {
+    var _me = Pool.create({
+      'maxconnections' : 4, 'maxidletime' : 100,
+    });
+    _me.query('query1', function (e, r) {
+      done();
+    });
+  });
+
   /* {{{ should_pool_create_works_fine() */
   it('should_pool_create_works_fine', function (done) {
     var _me = Pool.create({
