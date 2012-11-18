@@ -8,19 +8,13 @@ var Common = require(__dirname + '/common.js');
 
 var Connection = Common.mockConnection();
 
-var Fatal = function (msg) {
-  var e = new Error(msg);
-  e.fatal = true;
-  return e;
-}; 
-
 beforeEach(function () {
   Connection.makesureCleanAllData();
   Connection.__mockQueryResult(/SHOW\s+Variables\s+like\s+"READ_ONLY"/i, [{
     'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'
   }]);
-  Connection.__mockQueryResult(/error/i, [], new Error('TestError'));
-  Connection.__mockQueryResult(/fatal/i, [], Fatal('TestFatal'));
+  Connection.__mockQueryResult(/error/i, undefined, 'TestError');
+  Connection.__mockQueryResult(/fatal/i, undefined, {'fatal' : true, 'name' : 'TestFatal'});
 
   Pool.__set__({
     'HEARTBEAT_TIMEOUT' : 5,
@@ -74,7 +68,7 @@ describe('mysql pool', function () {
 
     var _messages = [];
     ['state', 'error'].forEach(function (i) {
-      _me.on(i, function () {
+      _me.on(i, function (e) {
         _messages.push([i].concat(Array.prototype.slice.call(arguments)));
       });
     });
@@ -85,13 +79,55 @@ describe('mysql pool', function () {
       _messages.should.eql([
         ['state'],          /**<  error引起 */
         ['error', 'aa'],
-        ['state'],          /**<  close引起 */
         /**<  一次正常，一次error后恢复 */
         ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
         ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
         ]);
+
+      _messages = [];
+      _me.setHeartBeatQuery('HEARTBEAT error');
+      setTimeout(function () {
+        _messages.should.eql([
+          ['state'],
+          ['error', 'TestError'],
+          ['error', 'TestError'],
+          ]);
+        done();
+      }, 60);
+    }, 60);
+  });
+  /* }}} */
+
+  /* {{{ should_close_query_connection_when_error() */
+  it('should_close_query_connection_when_error', function (done) {
+    var _me = Pool.create({'maxconnections' : 2});
+    _me.query('select fatal', function (e, r) {
+      e.should.eql({'fatal' : true, 'name' : 'TestFatal'});
       done();
-    }, 100);
+    });
+  });
+  /* }}} */
+
+  /* {{{ should_idletime_works_fine() */
+  it('should_idletime_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 2, 'maxidletime' : 10});
+    _me.query('query1', function (e, r) {
+      _me._stack.should.eql([]);
+      process.nextTick(function () {
+        _me._stack.should.eql([1]);
+        setTimeout(function () {
+          _me.query('query2', function (e, r) {
+            process.nextTick(function () {
+              _me._stack.should.eql([1]);
+              setTimeout(function () {
+                _me._stack.should.eql([]);
+                done();
+              }, 11);
+            });
+          });
+        }, 8);
+      });
+    });
   });
   /* }}} */
 
