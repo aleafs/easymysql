@@ -61,10 +61,6 @@ exports.mockConnection = function () {
     this.emit('close');
   };
 
-  Connection.prototype.clone = function () {
-    return new Connection();
-  };
-
   Connection.prototype.query = function (sql, tmout, callback) {
     var n = __queries.push(sql);
     var r = [], e = null;

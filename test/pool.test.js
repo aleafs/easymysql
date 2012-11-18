@@ -26,8 +26,24 @@ describe('mysql pool', function () {
     var _me = Pool.create({
       'maxconnections' : 4, 'maxidletime' : 100,
     });
+
+    _me._queue.should.eql([]);
+    _me._stack.should.eql([]);
+
+    var _messages = [];
+    ['state', 'error'].forEach(function (i) {
+      _me.on(i, function () {
+        _messages.push([i].concat(Array.prototype.slice.call(arguments)));
+      });
+    });
     _me.query('query1', function (e, r) {
-      done();
+      _messages.should.eql([['state', 3]]);
+      //Connection.__emitEvent(0, 'close');
+      process.nextTick(function () {
+        _me._queue.should.eql([]);
+        _me._stack.should.eql([1]);
+        done();
+      });
     });
   });
 
