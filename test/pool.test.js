@@ -8,11 +8,19 @@ var Common = require(__dirname + '/common.js');
 
 var Connection = Common.mockConnection();
 
+var Fatal = function (msg) {
+  var e = new Error(msg);
+  e.fatal = true;
+  return e;
+}; 
+
 beforeEach(function () {
   Connection.makesureCleanAllData();
   Connection.__mockQueryResult(/SHOW\s+Variables\s+like\s+"READ_ONLY"/i, [{
     'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'
   }]);
+  Connection.__mockQueryResult(/error/i, [], new Error('TestError'));
+  Connection.__mockQueryResult(/fatal/i, [], Fatal('TestFatal'));
 
   Pool.__set__({
     'HEARTBEAT_TIMEOUT' : 5,
@@ -22,9 +30,10 @@ beforeEach(function () {
 
 describe('mysql pool', function () {
 
-  it('should_pool_get_and_release_works_fine', function (done) {
+  /* {{{ should_mysql_pool_works_fine() */
+  it('should_mysql_pool_works_fine', function (done) {
     var _me = Pool.create({
-      'maxconnections' : 4, 'maxidletime' : 100,
+      'maxconnections' : 4, 
     });
 
     _me._queue.should.eql([]);
@@ -50,6 +59,7 @@ describe('mysql pool', function () {
           _me._stack.should.eql([2,3,4,1]);
           _me.query('should use 1', function (e,r) {
             _me._queue.should.eql([]);
+            _me._stack.should.eql([2,3,4]);
             process.nextTick(function () {
               _me._stack.should.eql([2,3,4,1]);
               done();
@@ -59,30 +69,21 @@ describe('mysql pool', function () {
       });
     }
   });
+  /* }}} */
 
-  /* {{{ should_pool_create_works_fine() */
-  it('should_pool_create_works_fine', function (done) {
-    var _me = Pool.create({
-      'maxidletime' : 32,
-    }, {});
+  /* {{{ should_heartbeat_restart_works_fine() */
+  it('should_heartbeat_restart_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 2});
 
-    var _messages = [];
-    ['state', 'error'].forEach(function (i) {
-      _me.on(i, function () {
-        _messages.push([i].concat(Array.prototype.slice.call(arguments, 0)));
-      });
+    var num = 0;
+    var state = 3;
+    _me.on('state', function (s) {
+      s.should.eql(state);
+
+      //Connection.__emitEvent(0, 'close');
+      state = 0;
+      setTimeout(done, 55);
     });
-
-    Connection.__emitEvent(0, 'close');
-
-    setTimeout(function () {
-      /*
-      _messages.should.eql([
-        ['state', 3]
-        ]);
-        */
-      done();
-    }, 32);
   });
   /* }}} */
 

@@ -1,5 +1,7 @@
 /* vim: set expandtab tabstop=2 shiftwidth=2 foldmethod=marker: */
 
+var Clone = require('clone');
+
 var config = {
   'host'  : '127.0.0.1',
   'port'  : 3306,
@@ -94,7 +96,7 @@ exports.mockConnection = function () {
   _me.__mockQueryResult = function (p, res, e) {
     __Results.push(function (s) {
       if (s.match(new RegExp(p))) {
-        return [res, e];
+        return [Clone(res), Clone(e)];
       }
     });
   };
