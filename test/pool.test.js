@@ -39,10 +39,8 @@ describe('mysql pool', function () {
     _me._queue.should.eql([]);
     _me._stack.should.eql([]);
 
-    var _messages = [];
     ['state', 'error'].forEach(function (i) {
       _me.on(i, function () {
-        _messages.push([i].concat(Array.prototype.slice.call(arguments)));
       });
     });
 
@@ -52,7 +50,6 @@ describe('mysql pool', function () {
         if (0 !== (--num)) {
           return;
         }
-        _messages.should.eql([['state', 3]]);
         process.nextTick(function () {
           _me._queue.should.eql([]);
           // 1,2,3,4,1,[2,3,4,1]
@@ -71,19 +68,30 @@ describe('mysql pool', function () {
   });
   /* }}} */
 
-  /* {{{ should_heartbeat_restart_works_fine() */
-  it('should_heartbeat_restart_works_fine', function (done) {
+  /* {{{ should_heartbeat_works_fine() */
+  it('should_heartbeat_works_fine', function (done) {
     var _me = Pool.create({'maxconnections' : 2});
 
-    var num = 0;
-    var state = 3;
-    _me.on('state', function (s) {
-      s.should.eql(state);
-
-      //Connection.__emitEvent(0, 'close');
-      state = 0;
-      setTimeout(done, 55);
+    var _messages = [];
+    ['state', 'error'].forEach(function (i) {
+      _me.on(i, function () {
+        _messages.push([i].concat(Array.prototype.slice.call(arguments)));
+      });
     });
+
+    Connection.__emitEvent(0, 'error', 'aa');
+    Connection.__emitEvent(0, 'close');
+    setTimeout(function () {
+      _messages.should.eql([
+        ['state'],          /**<  error引起 */
+        ['error', 'aa'],
+        ['state'],          /**<  close引起 */
+        /**<  一次正常，一次error后恢复 */
+        ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
+        ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
+        ]);
+      done();
+    }, 100);
   });
   /* }}} */
 
