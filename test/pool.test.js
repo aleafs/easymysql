@@ -36,15 +36,28 @@ describe('mysql pool', function () {
         _messages.push([i].concat(Array.prototype.slice.call(arguments)));
       });
     });
-    _me.query('query1', function (e, r) {
-      _messages.should.eql([['state', 3]]);
-      //Connection.__emitEvent(0, 'close');
-      process.nextTick(function () {
-        _me._queue.should.eql([]);
-        _me._stack.should.eql([1]);
-        done();
+
+    var num = 9;
+    for (var i = 0; i < num; i++) {
+      _me.query('SELECT ' + i, function (e, r) {
+        if (0 !== (--num)) {
+          return;
+        }
+        _messages.should.eql([['state', 3]]);
+        process.nextTick(function () {
+          _me._queue.should.eql([]);
+          // 1,2,3,4,1,[2,3,4,1]
+          _me._stack.should.eql([2,3,4,1]);
+          _me.query('should use 1', function (e,r) {
+            _me._queue.should.eql([]);
+            process.nextTick(function () {
+              _me._stack.should.eql([2,3,4,1]);
+              done();
+            });
+          });
+        });
       });
-    });
+    }
   });
 
   /* {{{ should_pool_create_works_fine() */
