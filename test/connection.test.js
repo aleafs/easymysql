@@ -66,13 +66,14 @@ describe('mysql connection', function () {
   it('should_connect_timeout_works_fine', function (done) {
     var blocker = getBlocker(33061, function () {
       var _config = Common.extend({
-        'host' : 'localhost', 'port' : 33061
+        'host' : 'localhost', 'port' : 33061, 'timeout' : 50,
       });
 
-      blocker.block();
+      blocker.blocking = true;
+      //blocker.block();
       var _me = Connection.create(_config);
       _me.on('error', function (e) {
-        e.should.have.property('name'/*, 'ConnectTimeout'*/);
+        e.should.have.property('name', 'ConnectTimeout');
         e.message.should.include(getAddress(_config));
         blocker.close();
         _me.close(done);
@@ -106,8 +107,12 @@ describe('mysql connection', function () {
         res.should.includeEql({'Database' : 'mysql'});
         var afterClosed = function () {
           _events.should.eql([[
-            'error', {'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
-            ], ['close']]);
+            'error', {
+              'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
+            ], [
+            'close', {
+              'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
+              ]]);
           _me.query('SHOW DATABASES', 100, function (error, res) {
             should.ok(error);
             error.should.have.property('code', 'PROTOCOL_ENQUEUE_AFTER_QUIT');
