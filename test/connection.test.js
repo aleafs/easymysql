@@ -20,6 +20,17 @@ var getAddress = function (config) {
 
 describe('mysql connection', function () {
 
+  /* {{{ should_connnect_error_works_fine() */
+  it('should_connnect_error_works_fine', function (done) {
+      var _me = Connection.create({'host' : 'localhost', 'port' : 80});
+      _me.on('error', function (e) {
+        e.should.have.property('name', 'MysqlError');
+        e.message.should.include('@localhost:80');
+        _me.close(done);
+      });
+  });
+  /* }}} */
+
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
     var _me = Connection.create(Common.config);
@@ -107,10 +118,10 @@ describe('mysql connection', function () {
         res.should.includeEql({'Database' : 'mysql'});
         var afterClosed = function () {
           _events.should.eql([[
-            'error', {
+            'close', {
               'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
             ], [
-            'close', {
+            'error', {
               'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
               ]]);
           _me.query('SHOW DATABASES', 100, function (error, res) {
