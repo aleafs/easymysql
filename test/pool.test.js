@@ -131,5 +131,27 @@ describe('mysql pool', function () {
   });
   /* }}} */
 
+  it('should_queue_timeout_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 1});
+
+    var num = 2;
+    _me.query('SLEEP 11', 15, function (e, r) {
+      if (0 === (--num)) {
+        done();
+      }
+    });
+
+    /**
+     * XXX: 只有一条连接
+     */
+    _me.query('QUEUED', 10, function (e, r) {
+      e.should.have.property('name', 'QueueTimeout');
+      e.message.should.include('Query stays in the queue more than 10 ms (test)');
+      if (0 === (--num)) {
+        done();
+      }
+    });
+  });
+
 });
 

@@ -53,6 +53,7 @@ exports.mockConnection = function () {
   /* {{{ private mocked Connection() */
   var Connection = function () {
     Emitter.call(this);
+    this._name  = 'test';
   };
   util.inherits(Connection, Emitter);
 
@@ -74,9 +75,15 @@ exports.mockConnection = function () {
         break;
       }
     }
-    process.nextTick(function () {
-      callback(e, r);
-    });
+    if (tmout < 10) {
+      process.nextTick(function () {
+        callback(e, r);
+      });
+    } else {
+      setTimeout(function () {
+        callback(e, r);
+      }, 3 + tmout);
+    }
   };
   /* }}} */
 
