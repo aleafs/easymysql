@@ -11,7 +11,7 @@ var Connection = Common.mockConnection();
 beforeEach(function () {
   Connection.makesureCleanAllData();
   Connection.__mockQueryResult(/SHOW\s+Variables\s+like\s+"READ_ONLY"/i, [{
-    'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'
+    'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'
   }]);
   Connection.__mockQueryResult(/error/i, undefined, 'TestError');
   Connection.__mockQueryResult(/fatal/i, undefined, {'fatal' : true, 'name' : 'TestFatal'});
@@ -80,8 +80,8 @@ describe('mysql pool', function () {
         ['state'],          /**<  error引起 */
         ['error', 'aa'],
         /**<  一次正常，一次error后恢复 */
-        ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
-        ['state', [{'Variable_Name' : 'READ_ONLY', 'Value' : 'OFF'}]],
+        ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
+        ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
         ]);
 
       _messages = [];

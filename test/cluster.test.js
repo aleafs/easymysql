@@ -4,14 +4,19 @@ var util = require('util');
 var should  = require('should');
 var rewire  = require('rewire');
 var Common  = require(__dirname + '/common.js');
-var Cluster = rewire(__dirname + '/../lib/main.js');
+var Cluster = rewire(__dirname + '/../lib/cluster.js');
 
 describe('mysql cluster', function () {
 
   it('should_mysql_cluster_works_fine', function (done) {
     var _me = Cluster.create({'maxconnections' : 2});
-    //_me.addserver();
-    done();
+    _me.addserver(Common.config);
+    
+    _me.query('SHOW DATABASES', 0, function (e, r) {
+      should.ok(!e);
+      r.should.includeEql({'Database' : 'mysql'});
+      done();
+    });
   });
 
 });
