@@ -94,7 +94,7 @@ describe('mysql pool', function () {
           ]);
         done();
       }, 60);
-    }, 60);
+    }, 120);
   });
   /* }}} */
 
@@ -131,6 +131,7 @@ describe('mysql pool', function () {
   });
   /* }}} */
 
+  /* {{{ should_queue_timeout_works_fine() */
   it('should_queue_timeout_works_fine', function (done) {
     var _me = Pool.create({'maxconnections' : 1});
 
@@ -152,6 +153,7 @@ describe('mysql pool', function () {
       }
     });
   });
+  /* }}} */
 
 });
 
