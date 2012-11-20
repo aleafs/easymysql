@@ -30,7 +30,7 @@ describe('mysql pool', function () {
       'maxconnections' : 4, 
     });
 
-    _me._queue.should.eql([]);
+    _me._queue.size().should.eql(0);
     _me._stack.should.eql([]);
 
     ['state', 'error'].forEach(function (i) {
@@ -40,16 +40,16 @@ describe('mysql pool', function () {
 
     var num = 9;
     for (var i = 0; i < num; i++) {
-      _me.query('SELECT ' + i, function (e, r) {
+      _me.query('SELECT ' + i, 0, function (e, r) {
         if (0 !== (--num)) {
           return;
         }
         process.nextTick(function () {
-          _me._queue.should.eql([]);
+          _me._queue.size().should.eql(0);
           // 1,2,3,4,1,[2,3,4,1]
           _me._stack.should.eql([2,3,4,1]);
-          _me.query('should use 1', function (e,r) {
-            _me._queue.should.eql([]);
+          _me.query('should use 1', 0, function (e,r) {
+            _me._queue.size().should.eql(0);
             _me._stack.should.eql([2,3,4]);
             process.nextTick(function () {
               _me._stack.should.eql([2,3,4,1]);
@@ -101,7 +101,7 @@ describe('mysql pool', function () {
   /* {{{ should_close_query_connection_when_error() */
   it('should_close_query_connection_when_error', function (done) {
     var _me = Pool.create({'maxconnections' : 2});
-    _me.query('select fatal', function (e, r) {
+    _me.query('select fatal', 0, function (e, r) {
       e.should.eql({'fatal' : true, 'name' : 'TestFatal'});
       done();
     });
@@ -111,12 +111,12 @@ describe('mysql pool', function () {
   /* {{{ should_idletime_works_fine() */
   it('should_idletime_works_fine', function (done) {
     var _me = Pool.create({'maxconnections' : 2, 'maxidletime' : 10});
-    _me.query('query1', function (e, r) {
+    _me.query('query1', 0, function (e, r) {
       _me._stack.should.eql([]);
       process.nextTick(function () {
         _me._stack.should.eql([1]);
         setTimeout(function () {
-          _me.query('query2', function (e, r) {
+          _me.query('query2', 0, function (e, r) {
             process.nextTick(function () {
               _me._stack.should.eql([1]);
               setTimeout(function () {
