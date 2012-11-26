@@ -40,6 +40,10 @@ mysql.addserver({
   'password' : ''
 });
 
+mysql.on('busy', function (queuesize, maxconnections) {
+  // XXX: write log and monitor it
+});
+
 mysql.query('SHOW DATABASES', function (error, res) {
   console.log(res);
 });
