@@ -18,7 +18,7 @@ describe('mysql cluster', function () {
   it('should_mysql_cluster_works_fine', function (done) {
     var _me = Cluster.create({'maxconnections' : 2});
     _me.addserver(Common.config);
-    
+  
     _me.query('SHOW DATABASES', function (e, r) {
       should.ok(!e);
       r.should.includeEql({'Database' : 'mysql'});

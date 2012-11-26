@@ -1,6 +1,6 @@
 {
   "name": "easymysql",
-  "version": "0.1.0-alpha",
+  "version": "0.1.0-beta",
   "author": "Aleafs Zhang (zhangxc83@gmail.com)",
   "contributors": [],
   "homepage": "git@github.com:aleafs/mysql-cluster.git",
@@ -8,7 +8,7 @@
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
     "mysql"     : "=2.0.0-alpha4",
-    "safequeue" : ">=0.0.1"
+    "safequeue" : ">=0.0.2"
   },
   "engines": {
     "node": ">=0.6.9"

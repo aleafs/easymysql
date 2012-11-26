@@ -111,13 +111,10 @@ describe('mysql pool', function () {
   /* {{{ should_idletime_works_fine() */
   it('should_idletime_works_fine', function (done) {
     var _me = Pool.create({'maxconnections' : 2, 'maxidletime' : 10});
-    _me.status().should.eql({'maxconnections' : 2, 'surplus' : 2});
     _me.query('query1', 0, function (e, r) {
       _me._stack.should.eql([]);
-      _me.status().should.eql({'maxconnections' : 2, 'surplus' : 1});
       process.nextTick(function () {
         _me._stack.should.eql([1]);
-        _me.status().should.eql({'maxconnections' : 2, 'surplus' : 2});
         setTimeout(function () {
           _me.query('query2', 0, function (e, r) {
             process.nextTick(function () {
