@@ -20,18 +20,6 @@ var getAddress = function (config) {
 
 describe('mysql connection', function () {
 
-  /* {{{ should_connnect_error_works_fine() */
-  it('should_connnect_error_works_fine', function (done) {
-    var _me = Connection.create({'host' : 'localhost', 'port' : 80});
-    _me.on('close', function (e) {
-      e.should.have.property('name', 'MysqlError');
-      e.message.should.include('@localhost:80');
-      _me.close();
-      done();
-    });
-  });
-  /* }}} */
-
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
     var _me = Connection.create(Common.config);
@@ -58,45 +46,6 @@ describe('mysql connection', function () {
   });
   /* }}} */
 
-  /* {{{ should_multi_connect_works_fine() */
-  it('should_multi_connect_works_fine', function (done) {
-    var _me = Connection.create(Common.config);
-    for (var i = 0; i < 10; i++) {
-      _me.connect(Common.config.timeout);
-    }
-    _me.on('error', function (e) {
-      (true).should.eql(false);
-    });
-    _me.query('SHOW DATABASES', 1000, function (e, r) {
-      should.ok(!e);
-      r.should.includeEql({'Database' : 'mysql'});
-      _me.close();
-      done();
-    });
-  });
-  /* }}} */
-
-  /* {{{ should_connect_timeout_works_fine() */
-  it('should_connect_timeout_works_fine', function (done) {
-    var blocker = getBlocker(33061, function () {
-      var _config = Common.extend({
-        'host' : 'localhost', 'port' : 33061, 'timeout' : 50,
-      });
-
-      blocker.blocking = true;
-      //blocker.block();
-      var _me = Connection.create(_config);
-      _me.on('error', function (e) {
-        e.should.have.property('name', 'ConnectTimeout');
-        e.message.should.include(getAddress(_config));
-        blocker.close();
-        _me.close();
-        done();
-      });
-    });
-  });
-  /* }}} */
-
   /* {{{ should_got_server_restart_event() */
   it('should_got_server_restart_event', function (done) {
     var blocker = getBlocker(33061, function () {
@@ -108,7 +57,7 @@ describe('mysql connection', function () {
       var _me = Connection.create(_config);
 
       var _events = [];
-      ['error', 'close'].forEach(function (i) {
+      ['error'].forEach(function (i) {
         _me.on(i, function (e) {
           if (e) {
             e.message.should.include(getAddress(_config));
@@ -122,7 +71,7 @@ describe('mysql connection', function () {
         res.should.includeEql({'Database' : 'mysql'});
         var afterClosed = function () {
           _events.should.eql([[
-            'close', {
+            'error', {
               'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
               ]]);
           _me.query('SHOW DATABASES', 100, function (error, res) {
