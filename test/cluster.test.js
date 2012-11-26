@@ -16,18 +16,28 @@ describe('mysql cluster', function () {
 
   /* {{{ should_mysql_cluster_works_fine() */
   it('should_mysql_cluster_works_fine', function (done) {
-    var _me = Cluster.create({'maxconnections' : 2});
+    var _me = Cluster.create({'maxconnections' : 1});
     _me.addserver(Common.config);
   
+    var _messages = [];
+    _me.on('busy', function (n, m) {
+      _messages.push(['busy'].concat(Array.prototype.slice.call(arguments)));
+    });
     _me.query('SHOW DATABASES', function (e, r) {
       should.ok(!e);
       r.should.includeEql({'Database' : 'mysql'});
 
-      _me.query('SELECT "rolist"', 100, function (e, r) {
-        should.ok(!e);
-        r.should.eql([{'rolist' : 'rolist'}]);
-        done();
-      });
+      var num = 3;
+      for (var i = 0; i < num; i++) {
+        _me.query('SELECT "rolist"', 100, function (e, r) {
+          should.ok(!e);
+          r.should.eql([{'rolist' : 'rolist'}]);
+          if (0 === (--num)) {
+            _messages.should.includeEql(['busy', 1, 1]);
+            done();
+          }
+        });
+      }
     });
   });
   /* }}} */
