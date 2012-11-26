@@ -78,9 +78,9 @@ describe('mysql pool', function () {
     setTimeout(function () {
       _messages.should.eql([
         ['state'],          /**<  error引起 */
-        ['error', 'aa'],
         /**<  一次正常，一次error后恢复 */
         ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
+        ['error', 'aa'],
         ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
         ]);
 

@@ -22,12 +22,13 @@ describe('mysql connection', function () {
 
   /* {{{ should_connnect_error_works_fine() */
   it('should_connnect_error_works_fine', function (done) {
-      var _me = Connection.create({'host' : 'localhost', 'port' : 80});
-      _me.on('error', function (e) {
-        e.should.have.property('name', 'MysqlError');
-        e.message.should.include('@localhost:80');
-        _me.close(done);
-      });
+    var _me = Connection.create({'host' : 'localhost', 'port' : 80});
+    _me.on('close', function (e) {
+      e.should.have.property('name', 'MysqlError');
+      e.message.should.include('@localhost:80');
+      _me.close();
+      done();
+    });
   });
   /* }}} */
 
@@ -37,7 +38,8 @@ describe('mysql connection', function () {
     _me.on('late', function (e, r) {
       should.ok(!e);
       r.should.includeEql({'SLEEP(0.02)' : '0'});
-      _me.close(done);
+      _me.close();
+      done();
     });
 
     var now = Date.now();
@@ -68,7 +70,8 @@ describe('mysql connection', function () {
     _me.query('SHOW DATABASES', 1000, function (e, r) {
       should.ok(!e);
       r.should.includeEql({'Database' : 'mysql'});
-      _me.close(done);
+      _me.close();
+      done();
     });
   });
   /* }}} */
@@ -87,7 +90,8 @@ describe('mysql connection', function () {
         e.should.have.property('name', 'ConnectTimeout');
         e.message.should.include(getAddress(_config));
         blocker.close();
-        _me.close(done);
+        _me.close();
+        done();
       });
     });
   });
@@ -120,15 +124,13 @@ describe('mysql connection', function () {
           _events.should.eql([[
             'close', {
               'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
-            ], [
-            'error', {
-              'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
               ]]);
           _me.query('SHOW DATABASES', 100, function (error, res) {
             should.ok(error);
             error.should.have.property('code', 'PROTOCOL_ENQUEUE_AFTER_QUIT');
             error.message.should.include(getAddress(_config));
-            _me.close(done);
+            _me.close();
+            done();
           });
         };
 
