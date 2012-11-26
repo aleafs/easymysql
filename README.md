@@ -1,17 +1,15 @@
 [![Build Status](https://secure.travis-ci.org/aleafs/easymysql.png?branch=master)](http://travis-ci.org/aleafs/easymysql)
 
-Click ***[here](http://aleafs.github.com/coverage/easymysql.html)*** to get the details of test coverage.
-
-正在开发中，尚不完备。
+Click **[here](http://aleafs.github.com/coverage/easymysql.html)** to get the details of test coverage.
 
 ## About
 
 `easymysql` 基于[`node-mysql`](https://github.com/felixge/node-mysql) 开发而来，提供一个简单、高可用的mysql连接基础库。主要特性如下：
 
 * 支持query超时控制；
-* 可控制的连接池支持，SQL总是尽可能早地被***可用的***空闲连接抢到并执行；
+* 可控制的连接池支持，SQL总是尽可能早地被**可用的**空闲连接抢到并执行；
 * 支持master-slave模式，基于`SHOW VARIABLES LIKE 'READ_ONLY'`方式自动判断主库和从库，运行期间自动感知主从切换；
-* 事务支持。
+* 即将支持事务。
 
 ## Install
 
@@ -40,7 +38,7 @@ mysql.addserver({
   'password' : ''
 });
 
-mysql.on('busy', function (queuesize, maxconnections) {
+mysql.on('busy', function (queuesize, maxconnections, which) {
   // XXX: write log and monitor it
 });
 

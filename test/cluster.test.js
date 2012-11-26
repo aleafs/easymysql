@@ -33,7 +33,8 @@ describe('mysql cluster', function () {
           should.ok(!e);
           r.should.eql([{'rolist' : 'rolist'}]);
           if (0 === (--num)) {
-            _messages.should.includeEql(['busy', 1, 1]);
+            _messages.should.includeEql(['busy', 1, 1, util.format('%s@%s:%d', 
+                Common.config.user, Common.config.host, Common.config.port)]);
             done();
           }
         });
