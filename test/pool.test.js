@@ -73,23 +73,15 @@ describe('mysql pool', function () {
       });
     });
 
-    Connection.__emitEvent(0, 'error', 'aa');
-    Connection.__emitEvent(0, 'close');
     setTimeout(function () {
       _messages.should.eql([
-        ['state'],          /**<  error引起 */
-        /**<  一次正常，一次error后恢复 */
-        ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
-        ['error', 'aa'],
-        ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]],
-        ]);
+        ['state', [{'Variable_name' : 'READ_ONLY', 'Value' : 'OFF'}]]]);
 
       _messages = [];
       _me.setHeartBeatQuery('HEARTBEAT error');
       setTimeout(function () {
         _messages.should.eql([
           ['state'],
-          ['error', 'TestError'],
           ['error', 'TestError'],
           ]);
         done();
