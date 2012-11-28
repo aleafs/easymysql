@@ -19,7 +19,7 @@ check() {
         return
     fi
 
-    lsof -p "${pid}" -i | grep -w "ESTABLISHED" | awk '{print $(NF - 1)}' | \
+    lsof -p "${pid}" | grep -w "ESTABLISHED" | grep "mysql" | awk '{print $(NF - 1)}' | \
         awk -F"[:>]" '{print $3}' | sort | uniq -c | \
         awk -v p="${pid}" -v t="${now}" '{printf "%s\t%d\t%s:%d\n", t, p, $2, $1}' 
 }
