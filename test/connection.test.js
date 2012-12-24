@@ -34,7 +34,6 @@ describe('mysql connection', function () {
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
       should.ok(!e);
       (Date.now() - now).should.above(9);
-      console.log(r);
       r.should.includeEql({'SLEEP(0.01)' : 0});
     });
 
