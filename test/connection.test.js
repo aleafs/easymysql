@@ -25,7 +25,7 @@ describe('mysql connection', function () {
     var _me = Connection.create(Common.config);
     _me.on('late', function (e, r) {
       should.ok(!e);
-      r.should.includeEql({'SLEEP(0.02)' : '0'});
+      r.should.includeEql({'SLEEP(0.02)' : 0});
       _me.close();
       done();
     });
@@ -34,7 +34,8 @@ describe('mysql connection', function () {
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
       should.ok(!e);
       (Date.now() - now).should.above(9);
-      r.should.includeEql({'SLEEP(0.01)' : '0'});
+      console.log(r);
+      r.should.includeEql({'SLEEP(0.01)' : 0});
     });
 
     var now = Date.now();
