@@ -1,13 +1,13 @@
 {
   "name": "easymysql",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Aleafs Zhang (zhangxc83@gmail.com)",
   "contributors": [],
   "homepage": "git@github.com:aleafs/mysql-cluster.git",
   "description": "Mysql client in cluster mode, based on node-mysql",
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
-    "mysql-robin" : "=2.0.3",
+    "mysql-robin" : "=2.0.4",
     "safequeue" : ">=0.0.2"
   },
   "engines": {
