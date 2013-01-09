@@ -19,6 +19,20 @@ var getAddress = function (config) {
 };
 
 describe('mysql connection', function () {
+
+  it('select * from table where a =:a and b = :b and c = :c and d=:d', function (done) {
+    var sql = {
+      sql: 'select * from table where a =:a and b = :b and c = :c and d=:d',
+      params: {a: 1, b: 2, d: '3'}
+    };
+    var con = Connection.create(Common.config);
+    sql = con.format(sql.sql, sql.params);
+    sql.should.include("a =1");
+    sql.should.include("b = 2");
+    sql.should.include('c = NULL');
+    sql.should.include("d='3'");
+    done();
+  });
  
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
