@@ -46,7 +46,7 @@ mysql.query('SHOW DATABASES', function (error, res) {
   console.log(res);
 });
 
-// support
+// bind params
 mysql.query({
   sql: 'select * from user where user =:user',
   params: {user: 'xxoo'}
@@ -57,6 +57,19 @@ mysql.query({
 
 ```
 
+## Contributors
+
+```
+ project: easymysql
+ commits: 130
+ files  : 16
+ authors: 
+   122  aleafs                 93.8%
+     4  tangyao                3.1%
+     3  zhaolei                2.3%
+     1  紫胤                   0.8%
+
+```
 ## License
 
 (The MIT License)
@@ -81,3 +94,4 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
