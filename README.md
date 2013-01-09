@@ -54,14 +54,6 @@ mysql.query({
   console.log(rows);
 });
 
-// also support use witch you like
-mysql.query({
-  sql: 'select * from user where user =?',
-  values: ['xxoo']
-}, function (err, rows) {
-	console.log(rows);
-});
-
 
 ```
 
