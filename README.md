@@ -46,6 +46,15 @@ mysql.query('SHOW DATABASES', function (error, res) {
   console.log(res);
 });
 
+// support
+mysql.query({
+  sql: 'select * from user where user =:user',
+  params: {user: 'xxoo'}
+}, function (err, rows) {
+  console.log(rows);
+});
+
+
 ```
 
 ## License
