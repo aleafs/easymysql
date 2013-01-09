@@ -19,6 +19,35 @@ var getAddress = function (config) {
 };
 
 describe('mysql connection', function () {
+
+  it('select * from table where a =:a and b = :b and c = :c and d=:d', function (done) {
+    var sql = {
+      sql: 'select * from table where a =:a and b = :b and c = :c and d=:d AND e IN (:e)',
+      params: {a: 1, b: 2, d: '3', e : [1.23,2,'5']}
+    };
+    var con = Connection.create(Common.config);
+    sql = con.format(sql.sql, sql.params);
+    sql.should.include("a =1");
+    sql.should.include("b = 2");
+    sql.should.include('c = NULL');
+    sql.should.include("d='3'");
+    sql.should.include("e IN (1.23, 2, '5')");
+    done();
+  });
+
+  it('select * from cdo_tcif.auth_user where username = :username should ok', function (done) {
+    var sql = 'select * from test.auth_user where username = :username';
+    var con = Connection.create(Common.config);
+    con.query({sql: sql, params: {username: 'ecchanger'}}, 5000, function (err, rows) {
+      should.not.exist(err);
+      should.exist(rows);
+      rows.should.length(1);
+      rows[0].username.should.eql('ecchanger');
+      done();
+    });
+  });
+
+
  
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
