@@ -34,20 +34,6 @@ describe('mysql connection', function () {
     sql.should.include("e IN (1.23, 2, '5')");
     done();
   });
-
-  it('select * from cdo_tcif.auth_user where username = :username should ok', function (done) {
-    var sql = 'select * from test.auth_user where username = :username';
-    var con = Connection.create(Common.config);
-    con.query({sql: sql, params: {username: 'ecchanger'}}, 5000, function (err, rows) {
-      should.not.exist(err);
-      should.exist(rows);
-      rows.should.length(1);
-      rows[0].username.should.eql('ecchanger');
-      done();
-    });
-  });
-
-
  
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
