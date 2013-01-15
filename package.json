@@ -7,7 +7,7 @@
   "description": "Mysql client in cluster mode, based on node-mysql",
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
-    "mysql-robin" : "=2.0.4",
+    "mysql-robin" : "=2.0.7",
     "safequeue" : ">=0.0.2"
   },
   "engines": {
