@@ -24,7 +24,7 @@ $ npm install easymysql
 var Client = require('easymysql');
 
 var mysql = Client.create({
-  'maxconnection' : 10
+  'maxconnections' : 10
 });
 
 mysql.addserver({

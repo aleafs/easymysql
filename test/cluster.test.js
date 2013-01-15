@@ -108,5 +108,31 @@ describe('mysql cluster', function () {
   });
   /* }}} */
 
+  /* {{{ should_emit_busy_works_fine() */
+  it('should_emit_busy_works_fine', function (done) {
+    var _me = Cluster.create({'maxconnections' : 1});
+    _me.addserver(Common.config);
+
+    var _busyResults = [];
+    _me.on('busy', function (queuesize, maxconnections, which) {
+      maxconnections.should.eql(1);
+      _busyResults.push(queuesize);
+    });
+    var num = 0;
+    for (var i = 0; i < 3; i++) {
+      _me.query('SELECT SLEEP(0.1)', function (e, r) {
+        num ++;
+        should.not.exist(e);
+        if (num >= 3) {
+          _busyResults.reduce(function (a, b) {
+            return a + b;
+          }).should.eql(3);
+          done();
+        }
+      });
+    }
+  });
+  /* }}}*/
+
 });
 
