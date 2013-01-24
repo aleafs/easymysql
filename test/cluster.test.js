@@ -5,6 +5,14 @@ var should  = require('should');
 var rewire  = require('rewire');
 var Common  = require(__dirname + '/common.js');
 var Cluster = rewire(__dirname + '/../lib/cluster.js');
+var interceptor = require('interceptor');
+
+var getBlocker = function (port, cb) {
+  var cfg = Common.extend();
+  var _me = interceptor.create(util.format('%s:%d', cfg.host, cfg.port || 3306));
+  _me.listen(port, cb);
+  return _me;
+};
 
 describe('mysql cluster', function () {
 
@@ -18,7 +26,7 @@ describe('mysql cluster', function () {
   it('should_mysql_cluster_works_fine', function (done) {
     var _me = Cluster.create({'maxconnections' : 1});
     _me.addserver(Common.config);
-  
+
     var _messages = [];
     _me.on('busy', function (n, m) {
       _messages.push(['busy'].concat(Array.prototype.slice.call(arguments)));
@@ -33,7 +41,7 @@ describe('mysql cluster', function () {
           should.ok(!e);
           r.should.eql([{'rolist' : 'rolist'}]);
           if (0 === (--num)) {
-            _messages.should.includeEql(['busy', 1, 1, util.format('%s@%s:%d', 
+            _messages.should.includeEql(['busy', 1, 1, util.format('%s@%s:%d',
                 Common.config.user, Common.config.host, Common.config.port)]);
             done();
           }
@@ -133,6 +141,43 @@ describe('mysql cluster', function () {
     }
   });
   /* }}}*/
+
+  it('should_server_no_response_works_fine', function (done) {
+    var blocker = getBlocker(33062);
+    var _config = Common.extend({
+      'host' : 'localhost', 'port' : 33062
+    });
+
+    var _me = Cluster.create({'maxconnections' : 1});
+    _me.addserver(_config);
+
+    _me.query('SHOW DATABASES', function (e, r) {
+      should.not.exist(e);
+      Array.isArray(r).should.be.true;
+
+      blocker.block();
+      setTimeout(afterBlock, 20);
+
+      function afterBlock() {
+        _me.query('SHOW DATABASES', 50, function (e, r) {
+          should.exist(e);
+          e.name.should.eql('QueryTimeout');
+
+          blocker.open();
+          setTimeout(afterOpen, 20);
+        });
+      }
+
+      function afterOpen() {
+        _me.query('SHOW DATABASES', 200, function (e, r) {
+          should.not.exist(e);
+          done();
+        });
+      }
+    });
+
+  });
+
 
 });
 

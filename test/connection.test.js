@@ -34,16 +34,10 @@ describe('mysql connection', function () {
     sql.should.include("e IN (1.23, 2, '5')");
     done();
   });
- 
+
   /* {{{ should_query_timeout_works_fine() */
   it('should_query_timeout_works_fine', function (done) {
     var _me = Connection.create(Common.config);
-    _me.on('late', function (e, r) {
-      should.ok(!e);
-      r.should.includeEql({'SLEEP(0.02)' : 0});
-      _me.close();
-      done();
-    });
 
     var now = Date.now();
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
@@ -57,6 +51,8 @@ describe('mysql connection', function () {
       e.should.have.property('name', 'QueryTimeout');
       e.message.should.include(getAddress(Common.config));
       (Date.now() - now).should.below(20);
+      _me.close();
+      done();
     });
   });
 
@@ -64,12 +60,6 @@ describe('mysql connection', function () {
     var config = Common.extend();
     config.port = undefined;
     var _me = Connection.create(config);
-    _me.on('late', function (e, r) {
-      should.ok(!e);
-      r.should.includeEql({'SLEEP(0.02)' : 0});
-      _me.close();
-      done();
-    });
 
     var now = Date.now();
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
@@ -84,6 +74,8 @@ describe('mysql connection', function () {
       e.message.should.include(getAddress(Common.config));
       e.message.should.not.include('NaN');
       (Date.now() - now).should.below(20);
+      _me.close();
+      done();
     });
   });
 
@@ -112,11 +104,13 @@ describe('mysql connection', function () {
       _me.query('SHOW DATABASES', 100, function (error, res) {
         should.ok(!error);
         res.should.includeEql({'Database' : 'mysql'});
+
         var afterClosed = function () {
           _events.should.eql([[
             'error', {
               'fatal' : true, 'code' : 'PROTOCOL_CONNECTION_LOST', 'name' : 'MysqlError'}
               ]]);
+
           _me.query('SHOW DATABASES', 100, function (error, res) {
             should.ok(error);
             error.should.have.property('code', 'PROTOCOL_ENQUEUE_AFTER_QUIT');
@@ -124,6 +118,7 @@ describe('mysql connection', function () {
             _me.close();
             done();
           });
+
         };
 
         blocker.outArr[0].once('close', function () {
