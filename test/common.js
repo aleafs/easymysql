@@ -2,7 +2,6 @@
 
 var Clone = require('clone');
 
-/*
 var config = {
   'host'  : '127.0.0.1',
   'port'  : 3306,
@@ -10,15 +9,6 @@ var config = {
   'password'  : '',
   'timeout' : 1000,
 };
-*/
-
-var config = {
-  'host'  : '10.232.132.3',
-  'port'  : 3306,
-  'user'  : 'db_write',
-  'password'  : '123456',
-  'timeout' : 1000,
-}
 
 try {
   var _ = require(__dirname + '/config.json');
