@@ -9,6 +9,7 @@ var config = {
   'password'  : '',
   'timeout' : 1000,       /**<  connect timeout in ms */
 };
+
 try {
   var _ = require(__dirname + '/config.json');
   for (var i in _) {
