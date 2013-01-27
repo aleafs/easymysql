@@ -7,7 +7,7 @@ var config = {
   'port'  : 3306,
   'user'  : 'root',
   'password'  : '',
-  'timeout' : 1000,
+  'timeout' : 1000,       /**<  connect timeout in ms */
 };
 
 try {
