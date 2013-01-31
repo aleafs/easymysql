@@ -44,23 +44,23 @@ describe('mysql connection', function () {
       should.ok(!e);
       (Date.now() - now).should.above(9);
       r.should.includeEql({'SLEEP(0.01)' : 0});
+
+      var now2 = Date.now();
+      _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
+        e.should.have.property('name', 'QueryTimeout');
+        e.message.should.include(getAddress(Common.config));
+        (Date.now() - now2).should.below(20);
+        _me.close();
+        done();
+      });
     });
 
-    var now = Date.now();
-    _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
-      e.should.have.property('name', 'QueryTimeout');
-      e.message.should.include(getAddress(Common.config));
-      (Date.now() - now).should.below(20);
-      _me.close();
-      done();
-    });
   });
 
   it('should_query_timeout_info_with_right_port', function (done) {
     var config = Common.extend();
     config.port = undefined;
     var _me = Connection.create(config);
-
     var now = Date.now();
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
       should.ok(!e);
@@ -113,7 +113,7 @@ describe('mysql connection', function () {
 
           _me.query('SHOW DATABASES', 100, function (error, res) {
             should.ok(error);
-            error.should.have.property('code', 'PROTOCOL_ENQUEUE_AFTER_QUIT');
+            error.should.have.property('code', 'PROTOCOL_CONNECTION_LOST');
             error.message.should.include(getAddress(_config));
             _me.close();
             done();
@@ -134,6 +134,59 @@ describe('mysql connection', function () {
     });
   });
   /* }}} */
+
+  it('should_connection_connected_api_works_fine', function (done) {
+    var config = Common.extend();
+    var _me = Connection.create(config);
+    should.ok(_me.connected());
+    _me.close();
+    _me.connected().should.be.false;
+    done();
+  });
+
+  it('should_connected_api_works_fine_when_server_blocked', function (done) {
+    var blocker = getBlocker(33063, function () {
+      var _config = Common.extend({
+        'host' : 'localhost', 'port' : 33063
+      });
+      blocker.block();
+
+      var afterBlock = function () {
+        var _me = Connection.create(_config);
+        _me.query('SHOW DATABASES', 0, function (e, r) {
+          should.exist(e);
+          e.code.should.eql('ECONNREFUSED');
+          should.ok(e.fatal);
+        });
+        _me.query('SHOW DATABASES', 100, function (e, r) {
+          should.exist(e);
+          e.code.should.eql('ECONNREFUSED');
+          should.ok(e.fatal);
+          _me.close();
+          blocker.close();
+          done();
+        });
+      };
+
+      setTimeout(afterBlock, 10);
+    });
+  });
+
+  it('should_socket_timeout_works_fine', function (done) {
+    var _config = Common.extend({
+      sockettimeout : 20
+    });
+    var _me = Connection.create(_config);
+    _me.query('SELECT SLEEP(1)', 'none', function (err, res) {
+      should.exist(err);
+      should.ok(err.fatal);
+      // error is caused by socket timeout
+      err.name.should.eql('SocketTimeout');
+      _me.close();
+      done();
+    });
+
+  });
 
 });
 

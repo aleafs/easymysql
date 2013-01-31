@@ -54,15 +54,22 @@ exports.mockConnection = function () {
   var Connection = function () {
     Emitter.call(this);
     this._name  = 'test';
+    this._flag = 1;
+    var _self = this;
   };
   util.inherits(Connection, Emitter);
 
-  Connection.prototype.connect = function () {
+  Connection.prototype.connected = function () {
+    return this._flag > 0;
   };
 
   Connection.prototype.close = function () {
     this.emit('close');
   };
+
+  Connection.prototype._setFlag = function (i) {
+    this._flag = i;
+  }
 
   Connection.prototype.query = function (sql, tmout, callback) {
     var n = __queries.push(sql);
@@ -116,6 +123,18 @@ exports.mockConnection = function () {
 
     var a = Array.prototype.slice.call(arguments, 1);
     c.emit.apply(c, a);
+  };
+
+  _me.__setFlag = function (i, flag) {
+    var c = __Objects[i];
+    if (!(c instanceof Connection)) {
+      return;
+    }
+    c._setFlag(flag);
+  };
+
+  _me.__connectionNum = function () {
+    return __Objects.length;
   };
 
   return _me;
