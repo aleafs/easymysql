@@ -177,9 +177,30 @@ describe('mysql pool', function () {
       should.not.exist(e);
       done();
     });
+  });
 
+  it('when_all_connection_flag_is_unuseable_pool_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 2});
+    var _r = [];
+    for (var i = 0; i < 5; i ++) {
+      _me.query('SHOW Variables like "READ_ONLY"', 10, function (e, r) {
+        _r.push(e || r);
+      });
+    }
+    var conns = Connection.__connectionNum();
 
+    setTimeout(function () {
+      [1, 2].forEach(function (i) {
+        Connection.__setFlag(i, -1);
+      });
+    }, 5);
 
+    setTimeout(function () {
+      _me.query('SHOW Variables like "READ_ONLY"', 10, function (e, r) {
+        should.not.exist(e);
+        done();
+      });
+    }, 10);
   });
 
 });

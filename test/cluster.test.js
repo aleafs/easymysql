@@ -149,6 +149,7 @@ describe('mysql cluster', function () {
     });
 
     var _me = Cluster.create({'maxconnections' : 1});
+    _me.on('error', function (e) {});
     _me.addserver(_config);
 
     _me.query('SHOW DATABASES', function (e, r) {
@@ -159,17 +160,16 @@ describe('mysql cluster', function () {
       setTimeout(afterBlock, 20);
 
       function afterBlock() {
-        _me.query('SHOW DATABASES', 50, function (e, r) {
+        _me.query('SHOW DATABASES', 10, function (e, r) {
           should.exist(e);
           e.name.should.eql('QueryTimeout');
-
           blocker.open();
           setTimeout(afterOpen, 20);
         });
       }
 
       function afterOpen() {
-        _me.query('SHOW DATABASES', 200, function (e, r) {
+        _me.query('SHOW DATABASES', 100, function (e, r) {
           should.not.exist(e);
           done();
         });
