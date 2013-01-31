@@ -61,7 +61,6 @@ describe('mysql connection', function () {
     var config = Common.extend();
     config.port = undefined;
     var _me = Connection.create(config);
-
     var now = Date.now();
     _me.query('SELECT SLEEP(0.01)', 0, function (e, r) {
       should.ok(!e);
@@ -139,13 +138,10 @@ describe('mysql connection', function () {
   it('should_connection_connected_api_works_fine', function (done) {
     var config = Common.extend();
     var _me = Connection.create(config);
+    should.ok(_me.connected());
+    _me.close();
     _me.connected().should.be.false;
-    _me.on('connect', function (e) {
-      should.not.exist(e);
-      should.ok(_me.connected());
-      _me.close();
-      done();
-    });
+    done();
   });
 
   it('should_connected_api_works_fine_when_server_blocked', function (done) {
@@ -157,24 +153,18 @@ describe('mysql connection', function () {
 
       var afterBlock = function () {
         var _me = Connection.create(_config);
-        _me.on('connect', function (e) {
+        _me.query('SHOW DATABASES', 0, function (e, r) {
           should.exist(e);
-          should.ok(e.fatal);
           e.code.should.eql('ECONNREFUSED');
-
-          _me.query('SHOW DATABASES', 0, function (e, r) {
-            should.exist(e);
-            e.code.should.eql('ECONNREFUSED');
-            should.ok(e.fatal);
-          });
-          _me.query('SHOW DATABASES', 100, function (e, r) {
-            should.exist(e);
-            e.code.should.eql('ECONNREFUSED');
-            should.ok(e.fatal);
-            _me.close();
-            blocker.close();
-            done();
-          });
+          should.ok(e.fatal);
+        });
+        _me.query('SHOW DATABASES', 100, function (e, r) {
+          should.exist(e);
+          e.code.should.eql('ECONNREFUSED');
+          should.ok(e.fatal);
+          _me.close();
+          blocker.close();
+          done();
         });
       };
 
@@ -187,19 +177,15 @@ describe('mysql connection', function () {
       sockettimeout : 20
     });
     var _me = Connection.create(_config);
-
-    _me.on('connect', function (e) {
-      should.not.exist(e);
-
-      _me.query('SELECT SLEEP(1)', 'none', function (err, res) {
-        should.exist(err);
-        should.ok(err.fatal);
-        // error is caused by socket timeout
-        err.name.should.eql('SocketTimeout');
-        _me.close();
-        done();
-      });
+    _me.query('SELECT SLEEP(1)', 'none', function (err, res) {
+      should.exist(err);
+      should.ok(err.fatal);
+      // error is caused by socket timeout
+      err.name.should.eql('SocketTimeout');
+      _me.close();
+      done();
     });
+
   });
 
 });
