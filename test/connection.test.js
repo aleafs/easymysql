@@ -44,16 +44,17 @@ describe('mysql connection', function () {
       should.ok(!e);
       (Date.now() - now).should.above(9);
       r.should.includeEql({'SLEEP(0.01)' : 0});
+
+      var now2 = Date.now();
+      _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
+        e.should.have.property('name', 'QueryTimeout');
+        e.message.should.include(getAddress(Common.config));
+        (Date.now() - now2).should.below(20);
+        _me.close();
+        done();
+      });
     });
 
-    var now = Date.now();
-    _me.query('SELECT SLEEP(0.02)', 15, function (e, r) {
-      e.should.have.property('name', 'QueryTimeout');
-      e.message.should.include(getAddress(Common.config));
-      (Date.now() - now).should.below(20);
-      _me.close();
-      done();
-    });
   });
 
   it('should_query_timeout_info_with_right_port', function (done) {
@@ -171,12 +172,33 @@ describe('mysql connection', function () {
             e.code.should.eql('ECONNREFUSED');
             should.ok(e.fatal);
             _me.close();
+            blocker.close();
             done();
           });
         });
       };
 
       setTimeout(afterBlock, 10);
+    });
+  });
+
+  it('should_socket_timeout_works_fine', function (done) {
+    var _config = Common.extend({
+      sockettimeout : 20
+    });
+    var _me = Connection.create(_config);
+
+    _me.on('connect', function (e) {
+      should.not.exist(e);
+
+      _me.query('SELECT SLEEP(1)', 'none', function (err, res) {
+        should.exist(err);
+        should.ok(err.fatal);
+        // error is caused by socket timeout
+        err.name.should.eql('SocketTimeout');
+        _me.close();
+        done();
+      });
     });
   });
 
