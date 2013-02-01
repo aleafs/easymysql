@@ -27,7 +27,7 @@ describe('mysql pool', function () {
   /* {{{ should_mysql_pool_works_fine() */
   it('should_mysql_pool_works_fine', function (done) {
     var _me = Pool.create({
-      'maxconnections' : 4, 
+      'maxconnections' : 4,
     });
 
     _me._queue.size().should.eql(0);
@@ -37,7 +37,6 @@ describe('mysql pool', function () {
       _me.on(i, function () {
       });
     });
-
     var num = 9;
     for (var i = 0; i < num; i++) {
       _me.query('SELECT ' + i, 0, function (e, r) {
@@ -146,6 +145,63 @@ describe('mysql pool', function () {
     });
   });
   /* }}} */
+
+  it('should_get_fatal_error_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 1});
+    _me.query('SELECT fatal', 20, function (e, r) {
+      should.exist(e);
+      should.ok(e.fatal);
+    });
+    _me.query('SHOW Variables like "READ_ONLY"', 0, function (e, r) {
+      should.not.exist(e);
+      done();
+    });
+  });
+
+  it('should_connecton_random_emit_error_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 1});
+    _me.on('error', function (e) {
+      should.exist(e);
+      e.message.should.eql('myError');
+    });
+
+    _me.query('SHOW Variables like "READ_ONLY"', 20, function (e, r) {
+      should.not.exist(e);
+    });
+
+    var e = new Error('myError');
+    e.fatal = 1;
+    Connection.__emitEvent(1, 'error', e);
+
+    _me.query('SHOW Variables like "READ_ONLY"', 0, function (e, r) {
+      should.not.exist(e);
+      done();
+    });
+  });
+
+  it('when_all_connection_flag_is_unuseable_pool_works_fine', function (done) {
+    var _me = Pool.create({'maxconnections' : 2});
+    var _r = [];
+    for (var i = 0; i < 5; i ++) {
+      _me.query('SHOW Variables like "READ_ONLY"', 10, function (e, r) {
+        _r.push(e || r);
+      });
+    }
+    var conns = Connection.__connectionNum();
+
+    setTimeout(function () {
+      [1, 2].forEach(function (i) {
+        Connection.__setFlag(i, -1);
+      });
+    }, 5);
+
+    setTimeout(function () {
+      _me.query('SHOW Variables like "READ_ONLY"', 10, function (e, r) {
+        should.not.exist(e);
+        done();
+      });
+    }, 10);
+  });
 
 });
 
