@@ -61,15 +61,15 @@ mysql.query({
 
 ```
  project: easymysql
- commits: 146
+ commits: 161
  files  : 16
  authors: 
-   130	aleafs                  89.0%
-    11	zhaolei                 7.5%
-     4	tangyao                 2.7%
-     1	紫胤                    0.7%
+   135	aleafs                  83.9%
+    21	zhaolei                 13.0%
+     4	tangyao                 2.5%
+     1	紫胤                  0.6%
 
-```
+ ```
 ## License
 
 (The MIT License)
