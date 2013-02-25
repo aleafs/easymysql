@@ -188,5 +188,77 @@ describe('mysql connection', function () {
 
   });
 
+  describe('a error lost connection case', function () {
+
+    it('should_return_error_when_query_after_the_close_method_called', function (done) {
+      var _me = Connection.create(Common.config);
+      _me.on('error', function (e) {});
+      var _count = 5;
+      var errors = [];
+      var _back = function (err, res) {
+        if (err) {
+          err.code.should.eql('PROTOCOL_ENQUEUE_AFTER_QUIT');
+          errors.push(err);
+        }
+        _count --;
+        if(_count <= 0) {
+          errors.length.should.eql(3);
+          done();
+        }
+      };
+
+     (function x() {
+        _me.query('SELECT SLEEP(0.2)', 0, function (e, r) {
+          _back(e, r);
+          if (3 === _count) {
+            _me.close();
+          }
+          if (_count) {
+            x();
+          }
+        });
+     })();
+
+    });
+
+    it('should_socket_timeout_then_close_not_hang_up', function (done) {
+      var _config = Common.extend({
+        sockettimeout : 10
+      });
+      var _me = Connection.create(_config);
+
+      _me.on('error', function (e) {});
+      var _count = 5;
+      var errors = {};
+      var _back = function (err, res) {
+        if (err) {
+          if (errors[err.name]) {
+            errors[err.name] ++;
+          } else {
+            errors[err.name] = 1;
+          }
+        }
+        _count --;
+        if(_count <= 0) {
+          errors.MysqlError.should.eql(3);
+          errors.SocketTimeout.should.eql(2);
+          done();
+        }
+      };
+
+      (function x() {
+         _me.query('SELECT SLEEP(0.2)', 0, function (e, r) {
+           _back(e, r);
+           if (3 === _count) {
+             _me.close();
+           }
+           if (_count) {
+             x();
+           }
+         });
+      })();
+    });
+  });
 });
+
 
