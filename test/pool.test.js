@@ -46,12 +46,25 @@ describe('mysql pool', function () {
         process.nextTick(function () {
           _me._queue.size().should.eql(0);
           // 1,2,3,4,1,[2,3,4,1]
-          _me._stack.should.eql([2,3,4,1]);
+          var expect = [];
+          _me._stack.forEach(function (c) {
+            expect.push(_me._conns.indexOf(c));
+          });
+          expect.should.eql([2,3,4,1]);
+
           _me.query('should use 1', 0, function (e,r) {
             _me._queue.size().should.eql(0);
-            _me._stack.should.eql([2,3,4]);
+            var expect = [];
+            _me._stack.forEach(function (c) {
+              expect.push(_me._conns.indexOf(c));
+            });
+            expect.should.eql([2,3,4]);
             process.nextTick(function () {
-              _me._stack.should.eql([2,3,4,1]);
+              var expect = [];
+              _me._stack.forEach(function (c) {
+                expect.push(_me._conns.indexOf(c));
+              });
+              expect.should.eql([2,3,4,1]);
               done();
             });
           });
@@ -105,11 +118,11 @@ describe('mysql pool', function () {
     _me.query('query1', 0, function (e, r) {
       _me._stack.should.eql([]);
       process.nextTick(function () {
-        _me._stack.should.eql([1]);
+        _me._stack.length.should.eql(1);
         setTimeout(function () {
           _me.query('query2', 0, function (e, r) {
             process.nextTick(function () {
-              _me._stack.should.eql([1]);
+              _me._stack.length.should.eql(1);
               setTimeout(function () {
                 _me._stack.should.eql([]);
                 done();
@@ -121,6 +134,36 @@ describe('mysql pool', function () {
     });
   });
   /* }}} */
+
+  it('should_when_idletimeout_removed_then_stack_and_conns_match', function (done) {
+    var _me = Pool.create({'maxconnections' : 3, 'maxidletime' : 10});
+    function makeConcurrent(cb) {
+      for (var i = 0; i < 3; i ++) {
+        _me.query('query1', 0, function (e, r) {
+          _ok();
+        });
+      }
+      var count = 0;
+      function _ok() {
+        count ++;
+        if (3 === count) {
+          process.nextTick(function () {
+           cb();
+          });
+        }
+      }
+    }
+    makeConcurrent(function () {
+      _me._stack.length.should.eql(3);
+      _me._conns.length.should.eql(4);
+      setTimeout(function () {
+        _me._stack.should.eql([]);
+        done();
+      }, 12);
+    });
+
+
+  });
 
   /* {{{ should_queue_timeout_works_fine() */
   it('should_queue_timeout_works_fine', function (done) {
