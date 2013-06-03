@@ -1,4 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/aleafs/easymysql.png?branch=master)](http://travis-ci.org/aleafs/easymysql)
+[![Dependency Status](https://gemnasium.com/aleafs/easymysql.png)](https://gemnasium.com/aleafs/easymysql)
 
 Click **[here](http://aleafs.github.com/coverage/easymysql.html)** to get the details of test coverage.
 
