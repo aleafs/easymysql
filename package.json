@@ -3,7 +3,7 @@
   "version": "0.2.7",
   "author": "Aleafs Zhang (zhangxc83@gmail.com)",
   "contributors": [],
-  "homepage": "git@github.com:aleafs/mysql-cluster.git",
+  "homepage": "https://github.com/aleafs/easymysql",
   "description": "Mysql client in cluster mode, based on node-mysql",
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
@@ -20,6 +20,10 @@
     "interceptor" : ">=0.0.5",
     "rewire"      : ">=1.0.3",
     "visionmedia-jscoverage" : ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aleafs/easymysql.git"
   },
   "main": "./index.js",
   "scripts": {
