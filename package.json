@@ -7,7 +7,7 @@
   "description": "Mysql client in cluster mode, based on node-mysql",
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
-    "mysql-robin" : "=2.0.8",
+    "mysql" : "=2.0.0-rc1",
     "safequeue" : ">=0.0.2"
   },
   "engines": {
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aleafs/easymysql.git"
+    "url": "git://github.com/aleafs/easymysql.git"
   },
   "main": "./index.js",
   "scripts": {
