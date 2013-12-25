@@ -7,23 +7,23 @@
   "description": "Mysql client in cluster mode, based on node-mysql",
   "keywords": [ "mysql", "cluster" ],
   "dependencies": {
-    "mysql-robin" : "=2.0.8",
+    "mysql" : "=2.0.0-rc2",
     "safequeue" : ">=0.0.2"
   },
   "engines": {
-    "node": ">=0.6.9"
+    "node": ">=0.8"
   },
   "devDependencies": {
-    "clone"       : ">=0.1.1",
-    "mocha"       : ">=0.9.0",
-    "should"      : ">=0.4.2",
-    "interceptor" : ">=0.0.5",
-    "rewire"      : ">=1.0.3",
-    "visionmedia-jscoverage" : ">=1.0.0"
+    "clone"       : "~0.1.11",
+    "mocha"       : "~1.16.2",
+    "should"      : "~2.1.1",
+    "interceptor" : "~0.1.4",
+    "rewire"      : "~2.0.0",
+    "visionmedia-jscoverage" : "~1.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aleafs/easymysql.git"
+    "url": "git://github.com/aleafs/easymysql.git"
   },
   "main": "./index.js",
   "scripts": {
