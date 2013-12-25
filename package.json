@@ -11,7 +11,7 @@
     "safequeue" : ">=0.0.2"
   },
   "engines": {
-    "node": ">=0.6.9"
+    "node": ">=0.8"
   },
   "devDependencies": {
     "clone"       : "~0.1.11",
