@@ -31,12 +31,14 @@ var mysql = Client.create({
 mysql.addserver({
   'host' : '127.0.0.1',
   'user' : 'write_user',
-  'password' : ''
+  'password' : '',
+  'database' : 'your_databasse'
 });
 mysql.addserver({
   'host' : '127.0.0.1',
   'user' : 'read_user',
-  'password' : ''
+  'password' : '',
+  'database' : 'your_databasse'
 });
 
 mysql.on('busy', function (queuesize, maxconnections, which) {
